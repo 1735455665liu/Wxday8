@@ -20,9 +20,6 @@ Route::get('valid','User\UserController@valid');
 //接收微信服务器推送事件
 Route::post('valid','User\UserController@wxEvent');
 
-<<<<<<< HEAD
-=======
 
 Route::get('/weixin/get_access_token','User\UserController@getAccessToken');
 Route::get('/weixin/test','User\UserController@test');
->>>>>>> 4a9357ba3813f60c4daac02a9f953da93381b0a4
