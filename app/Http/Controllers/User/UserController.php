@@ -21,9 +21,7 @@ class UserController extends Controller
     {
         echo $this->getAccessToken();
     }
-    /**
-     * 接收微信事件推送 POST
-     */
+    //接收微信事件推送 POST
     public function wxEvent()
     {
         //接收微信服务器推送
@@ -38,15 +36,17 @@ class UserController extends Controller
 //        echo 'MsgType: '. $data->MsgType;echo '</br>';              // 消息类型
 //        echo 'Event: '. $data->Event;echo '</br>';                  // 事件类型
 //        echo 'EventKey: '. $data->EventKey;echo '</br>';
-        $wx_id = $data->ToUserName;             // 公众号ID
-        $openid = $data->FromUserName;          //用户OpenID
-        $event = $data->Event;          //事件类型
-        if($event=='subscribe'){            //扫码关注事件
+        $wx_id = $data->ToUserName;  // 公众号ID
+        $openid = $data->FromUserName;  //用户OpenID
+        $event = $data->Event;  //事件类型
+        if($event=='subscribe'){
             //根据openid判断用户是否已存在
+            //用户关注过
             $local_user = Wx::where(['openid'=>$openid])->first();
-            if($local_user){        //用户之前关注过
+            if($local_user){
                 echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎回来 '. $local_user['nickname'] .']]></Content></xml>';
-            }else{          //用户首次关注
+            }else{
+                //首次关注
                 //获取用户信息
                 $u = $this->getUserInfo($openid);
                 //用户信息入库
@@ -63,9 +63,9 @@ class UserController extends Controller
             }
         }
     }
-    /**
-     * 获取微信 AccessToken
-     */
+
+//    获取微信 AccessToken
+
     public function getAccessToken()
     {
         //是否有缓存
@@ -78,7 +78,7 @@ class UserController extends Controller
             $arr = json_decode($response,true);
             //缓存 access_token
             Redis::set($key,$arr['access_token']);
-            Redis::expire($key,3600);       //缓存时间 1小时
+            Redis::expire($key,3600); //缓存时间 1小时
             $token = $arr['access_token'];
         }
         return $token;
@@ -88,10 +88,8 @@ class UserController extends Controller
         $access_token = $this->getAccessToken();
         echo 'token : '. $access_token;echo '</br>';
     }
-    /**
-     * 获取微信用户信息
-     * @param $openid
-     */
+
+    // 获取微信用户信息
     public function getUserInfo($openid)
     {
         $url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='.$this->getAccessToken().'&openid='.$openid.'&lang=zh_CN';
@@ -99,15 +97,14 @@ class UserController extends Controller
         $u = json_decode($data,true);
         return $u;
     }
-    /**
-     * 创建公众号菜单
-     */
+
+    // 创建公众号菜单
+
     public function createMenu()
     {
-        // url
         $url = 'https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $this->getAccessToken();
         // 接口数据
-        $post_arr = [               //注意菜单层级关系
+        $post_arr = [ //菜单层级关系
             'button' => [
                 [
                     'type' => 'click',
@@ -120,11 +117,11 @@ class UserController extends Controller
                     'key' => 'key_menu_002'
                 ],
             ]
-        ];
-        $json_str = json_encode($post_arr, JSON_UNESCAPED_UNICODE);  //处理中文编码
+        ];//处理中文编码
+        $json_str = json_encode($post_arr, JSON_UNESCAPED_UNICODE);
         // 发送请求
         $clinet = new Client();
-        $response = $clinet->request('POST', $url, [      //发送 json字符串
+        $response = $clinet->request('POST', $url, [//发送 json字符串
             'body' => $json_str
         ]);
         //处理响应
@@ -132,10 +129,8 @@ class UserController extends Controller
         $arr = json_decode($res_str, true);
         //判断错误信息
         if ($arr['errcode'] > 0) {
-            //TODO 错误处理
             echo "创建菜单失败";
         } else {
-            // TODO 正常逻辑
             echo "创建菜单成功";
         }
     }
