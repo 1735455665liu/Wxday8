@@ -7,48 +7,21 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use App\Model\User\Wx;
+use GuzzleHttp\Client;
 class UserController extends Controller
 {
-<<<<<<< HEAD
+
     public function valid(){
         echo $_GET['echostr'];
     }
-    public function wxEvent()
-    {
-//        //接收微信服务器推送
-        $content = file_get_contents("php://input");
-        var_dump($content);
-        $time = date('Y-m-d H:i:s');
-        $str = $time . $content . "\n";
-        file_put_contents("logs/wx_event.log", $str, FILE_APPEND);
-    }
-=======
-
     /**
      * 处理首次接入GET请求
      */
-    public function valid()
-    {
-        echo $_GET['echostr'];
-    }
     public function atoken()
     {
         echo $this->getAccessToken();
     }
-<<<<<<< HEAD
     //接收微信事件推送 POST
-=======
-    /**
-     * 接收微信事件推送 POST
-     */
-<<<<<<< HEAD
->>>>>>> 4a9357ba3813f60c4daac02a9f953da93381b0a4
-
-
-
-=======
->>>>>>> dc50cf095d2526b5cfbc19a474df191d011d989c
->>>>>>> c5fcdd9525c1d1d47ea85fce42b97135861c4ab6
     public function wxEvent()
     {
         //接收微信服务器推送

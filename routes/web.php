@@ -15,16 +15,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-<<<<<<< HEAD
-//微信接口接入
-Route::get('valid','User\UserController@valid');
-//接收微信服务器推送事件
-Route::post('/weixin/valid','User\UserController@wxEvent');
-=======
->>>>>>> dc50cf095d2526b5cfbc19a474df191d011d989c
-
-
-
 Route::get('/test/redis/aaa','Test\TestController@aaa');
 
 Route::get('/test/atoken','User\UserController@atoken');
