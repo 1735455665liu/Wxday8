@@ -76,14 +76,14 @@ class UserController extends Controller
         if($token){
 
         }else{
-        //通过Taccess_token获取信息
-        $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.env('WX_APPID').'&secret='.env('WX_APPSECRET');
-        $response=file_get_contents($url);
-        $arr=json_decode($response,true);
-        //设置
-        Redis::set($key,$arr['access_token']);
-        Redis::expire($key,7200);  //缓存2小时
-        $token=$arr['access_token'];
+            //通过Taccess_token获取信息
+            $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.env('WX_APPID').'&secret='.env('WX_APPSECRET');
+            $response=file_get_contents($url);
+            $arr=json_decode($response,true);
+            //设置
+            Redis::set($key,$arr['access_token']);
+            Redis::expire($key,7200);  //缓存2小时
+            $token=$arr['access_token'];
         }
         return $token;
 
@@ -99,5 +99,65 @@ class UserController extends Controller
     public function test(){
         $access_token=$this->getAccessToken();
         echo'token :'.$access_token;echo'<br>';
+    }
+
+
+
+
+
+    //创建公众号菜单
+    public function createMenu(){
+        //1、调用公众号菜单的接口
+        $url=' https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$this->getAccessToken();
+        //接口数据
+        $p_arr=[
+
+            "button"=>[
+                [
+                    "type"=>"click",
+                    "name"=>"烨氏了解一下",
+                    "key"=>"V1001_TODAY_MUSIC"
+                ],
+                "name"=>"本人",
+                "sub_button"=>[
+                    "type"=>"view",
+                    "name"=>"缺点",
+                    "url"=>"http://www.soso.com/"
+                ],
+                [
+                    "type"=>"miniprogram",
+                    "name"=>"颜值高",
+                    "url"=>"http://mp.weixin.qq.com",
+                    "appid"=>"wx286b93c14bbf93aa",
+                    "pagepath"=>"pages/lunar/index"
+                ],
+                [
+                    "type"=>"click",
+                    "name"=>"还是高",
+                    "key"=>"V1001_GOOD"
+                ]
+            ]
+        ];
+        //处理中文编码
+        $json_str=json_encode($p_arr,JSON_UNESCAPED_UNICODE);
+        //发送请求
+        $cli= new Client();
+        $response=$cli->request('POST',$url,[
+            'body' => $json_str
+        ]);
+        //处理响应
+        $res_str=$response->getBody();
+        $arr =json_decode($res_str,true);
+        //判断错误信息
+        if($arr['errcode']>0){
+            echo "创建菜单失败";
+        }else{
+            echo "创建菜单成功";
+        }
+
+
+
+
+
     }
 }
