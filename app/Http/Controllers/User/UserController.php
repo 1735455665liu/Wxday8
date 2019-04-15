@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
 use App\Model\User\Wx;
+use App\Model\User\wxtext;
 use GuzzleHttp\Client;
 class UserController extends Controller
 {
@@ -20,52 +21,62 @@ class UserController extends Controller
     {
         //接收微信服务器推送
         $content = file_get_contents("php://input");
+//       echo $content;die;
         $time = date('Y-m-d H:i:s');
         $str = $time . $content . "\n";
         file_put_contents("logs/wx_event.log",$str,FILE_APPEND);
-        $data = simplexml_load_string($content);
-
-        echo 'ToUserName: '. $data->ToUserName;echo '</br>';        // 公众号ID
-        echo 'FromUserName: '. $data->FromUserName;echo '</br>';    // 用户OpenID
-        echo 'CreateTime: '. $data->CreateTime;echo '</br>';        // 时间戳
-        echo 'MsgType: '. $data->MsgType;echo '</br>';              // 消息类型
-        echo 'Event: '. $data->Event;echo '</br>';                  // 事件类型
-        echo 'EventKey: '. $data->EventKey;echo '</br>';
-
+        $data=simplexml_load_string($content);
+//        echo 'ToUserName: '. $data->ToUserName;echo '</br>';        // 公众号ID
+//        echo 'FromUserName: '. $data->FromUserName;echo '</br>';    // 用户OpenID
+//        echo 'CreateTime: '. $data->CreateTime;echo '</br>';        // 时间戳
+//        echo 'MsgType: '. $data->MsgType;echo '</br>';              // 消息类型
+//        echo 'Event: '. $data->Event;echo '</br>';                  // 事件类型
+//        echo 'EventKey: '. $data->EventKey;echo '</br>';
+//        die;
         $wx_id = $data->ToUserName;             // 公众号ID
-        $openid = $data->FromUserName;          //用户OpenID
-        $event = $data->Event;          //事件类型
+        $openid = $data->FromUserName;         //用户OpenID
+        $event = $data->Event;                 //事件类型
+        $MsgType = $data->MsgType;
+        $media_id=$data->MediaId;               //媒体文件Id
+        $aa=$this->WxImage($media_id);
+        var_dump($aa);
+//        消息类型
+        if(isset($MsgType)){
+                if($MsgType=='text'){ //文本消息入库
+                    $a_arr=[
+                      'openid'=>$openid, //用户id
+                        'Content'=>$data->Content,//文本信息
+                        'CreateTime'=>$data->CreateTime,//发送信息事件
+                        'd_time'=>time()//当前时间
+                    ];
+                    $textInfo=wxtext::insertGetId($a_arr);
+                    var_dump($textInfo);die;
+                }
 
-//        var_dump($u);
-        if($event=='subscribe'){
-            //扫码关注事件  通过查询数据库  做判断
-            $Info=Wx::where(['openid'=>$openid])->first();
-            if($Info){
-                //数据库有值 就说明关注过
-                echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎回来 '. $Info['nickname'] .']]></Content></xml>';
-            }else{
-                //没有值 添加入库
-                $u=$this->getUserInfo($openid);
-                $add=[
-                    'openid'    => $u['openid'],
-                    'nickname'  => $u['nickname'],
-                    'sex'  => $u['sex'],
-                    'city'  => $u['city'],
-                    'headimgurl'  => $u['headimgurl'],
-                    'province'  => $u['province'],
-                    'country'  => $u['country'],
-                ];
-                $userInfo=Wx::insertGetId($add);
-                echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎关注 '. $u['nickname'] .']]></Content></xml>';
-            }
+
+            if($event=='subscribe'){
+                //扫码关注事件  通过查询数据库  做判断
+                $Info=Wx::where(['openid'=>$openid])->first();
+                if($Info){
+                    //数据库有值 就说明关注过
+                    echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎回来 '. $Info['nickname'] .']]></Content></xml>';
+                }else{
+                    //没有值 添加入库
+                    $u=$this->getUserInfo($openid);
+                    $add=[
+                        'openid'    => $u['openid'],
+                        'nickname'  => $u['nickname'],
+                        'sex'  => $u['sex'],
+                        'city'  => $u['city'],
+                        'headimgurl'  => $u['headimgurl'],
+                        'province'  => $u['province'],
+                        'country'  => $u['country'],
+                    ];
+                    $userInfo=Wx::insertGetId($add);
+                    echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎关注 '. $u['nickname'] .']]></Content></xml>';
+                }
+            }//入库提示
         }
-
-
-
-
-
-
-
 
     }
     //根据access_koken获取用户信息 存到Redis中
@@ -93,18 +104,12 @@ class UserController extends Controller
         $url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='.$this->getAccessToken().'&openid='.$openid.'&lang=zh_CN';
         $date=file_get_contents($url);
         $u=json_decode($date,true);
-//        var_dump($arr);
         return $u;
     }
     public function test(){
         $access_token=$this->getAccessToken();
         echo'token :'.$access_token;echo'<br>';
     }
-
-
-
-
-
     //创建公众号菜单
     public function createMenu(){
         //1、调用公众号菜单的接口
@@ -160,4 +165,5 @@ class UserController extends Controller
 
 
     }
+
 }

@@ -27,4 +27,7 @@ Route::get('test','User\UserController@test');
 Route::post('createMenu','User\UserController@createMenu');
 
 
+Route::post('WxImage','User\UserController@WxImage');//图片素材
+
+
 
