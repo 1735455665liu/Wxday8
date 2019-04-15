@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Model\User\Wx;
 use App\Model\User\wxtext;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
 
@@ -37,8 +38,8 @@ class UserController extends Controller
         $openid = $data->FromUserName;         //用户OpenID
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
-        $media_id=$data->MediaId;               //媒体文件Id
-        $aa=$this->WxImage($media_id);
+        $media_id=$data->MediaId;
+        $aa=$this->Wxyy($media_id);
         var_dump($aa);
 //        消息类型
         if(isset($MsgType)){
@@ -50,7 +51,8 @@ class UserController extends Controller
                         'd_time'=>time()//当前时间
                     ];
                     $textInfo=wxtext::insertGetId($a_arr);
-                    var_dump($textInfo);die;
+                }else if($MsgType=='voice'){
+//                    $this->Wxyy()
                 }
 
 
@@ -164,6 +166,39 @@ class UserController extends Controller
 
 
 
+    }
+    //图片素材
+    public function WxImage($media_id){
+    //调用素材接口
+    $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
+    //获取文件名
+    $Client=new Client();
+    $response = $Client->get($url);
+    $file_info = $response->getHeader('Content-disposition'); //通过第三方类库获取文件的详细信息
+    $file_name = substr(rtrim($file_info[0],'"'),-20); //把图片多余的符号去除并截取
+        $file_url='/wx/image/'.$file_name; //图片的路径+图片
+   //保存图片
+        $imgInfo=Storage::disk('local')->put($file_url,$response->getBody());
+//        if($imgInfo){
+//            echo 1;
+//        }else{
+//            echo  2;
+//        }
+        return $file_name;
+
+}
+    //语音素材
+    public function Wxyy($media_id){
+        $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
+        $client=new Client();
+        $response=$client->get($url);
+        $fileinfo=$response->getHeader('Content-disposition');
+        $file_name=rtrim(substr($fileinfo[0],-20),'"');
+        $wx_image_path = 'wx/images/'.$file_name;
+        //保存语音
+        $wxy=Storage::disk('local')->put($wx_image_path,$response->getBody());
+        var_dump($wxy);
+        return $file_name;
     }
 
 }
