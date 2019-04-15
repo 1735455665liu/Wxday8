@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\DB;
+use App\Model\User\wxyuyin;
 use App\Model\User\Wx;
 use App\Model\User\wxtext;
 use GuzzleHttp\Client;
@@ -38,9 +39,8 @@ class UserController extends Controller
         $openid = $data->FromUserName;         //用户OpenID
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
-        $media_id=$data->MediaId;
-        $aa=$this->Wxyy($media_id);
-        var_dump($aa);
+        $media_id=$data->MediaId;               //媒体文件id
+
 //        消息类型
         if(isset($MsgType)){
                 if($MsgType=='text'){ //文本消息入库
@@ -51,9 +51,19 @@ class UserController extends Controller
                         'd_time'=>time()//当前时间
                     ];
                     $textInfo=wxtext::insertGetId($a_arr);
-                }else if($MsgType=='voice'){
-//                    $this->Wxyy()
-                }
+                }else if($MsgType=='voice'){    //语音入库
+                    $file_name=$this->Wxyy($media_id); //语音的信息
+                    $b_arr=[
+                      'openid'=>$openid,    //用户id
+                      'msg_type'=>'voice',  // 类型
+                        'mediaid'=>$data->MediaId, //媒体文件id
+                        'format'=>$data->Format,     //后缀
+                        'MsgId'=>$data->MsgId,
+                        'file_url'=>$file_name,
+                    ];
+                    //入库
+                    $fileyyInfo=wxyuyin::insertGetId($b_arr);
+        }
 
 
             if($event=='subscribe'){
@@ -197,7 +207,6 @@ class UserController extends Controller
         $wx_image_path = 'wx/images/'.$file_name;
         //保存语音
         $wxy=Storage::disk('local')->put($wx_image_path,$response->getBody());
-        var_dump($wxy);
         return $file_name;
     }
 
