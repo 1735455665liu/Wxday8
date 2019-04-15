@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Model\User\wxyuyin;
 use App\Model\User\Wx;
 use App\Model\User\wxtext;
+use App\Model\User\wximage;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
@@ -43,27 +44,38 @@ class UserController extends Controller
 
 //        消息类型
         if(isset($MsgType)){
-                if($MsgType=='text'){ //文本消息入库
-                    $a_arr=[
-                      'openid'=>$openid, //用户id
-                        'Content'=>$data->Content,//文本信息
-                        'CreateTime'=>$data->CreateTime,//发送信息事件
-                        'd_time'=>time()//当前时间
-                    ];
-                    $textInfo=wxtext::insertGetId($a_arr);
-                }else if($MsgType=='voice'){    //语音入库
-                    $file_name=$this->Wxyy($media_id); //语音的信息
-                    $b_arr=[
-                      'openid'=>$openid,    //用户id
-                      'msg_type'=>'voice',  // 类型
-                        'mediaid'=>$data->MediaId, //媒体文件id
-                        'format'=>$data->Format,     //后缀
-                        'MsgId'=>$data->MsgId,
-                        'file_url'=>$file_name,
-                    ];
-                    //入库
-                    $fileyyInfo=wxyuyin::insertGetId($b_arr);
-        }
+            if($MsgType=='text'){ //文本消息入库
+                $a_arr=[
+                    'openid'=>$openid, //用户id
+                    'Content'=>$data->Content,//文本信息
+                    'CreateTime'=>$data->CreateTime,//发送信息事件
+                    'd_time'=>time()//当前时间
+                ];
+                $textInfo=wxtext::insertGetId($a_arr);
+            }else if($MsgType=='voice'){    //语音入库
+                $file_name=$this->Wxyy($media_id); //语音的信息
+                $b_arr=[
+                    'openid'=>$openid,    //用户id
+                    'msg_type'=>'voice',  // 类型
+                    'mediaid'=>$data->MediaId, //媒体文件id
+                    'format'=>$data->Format,     //后缀
+                    'MsgId'=>$data->MsgId,
+                    'file_url'=>$file_name,
+                ];
+                //入库
+                $fileyyInfo=wxyuyin::insertGetId($b_arr);
+            }else if($MsgType=='image'){
+                $file_name=$this->WxImage($media_id);
+                $c_arr=[
+                  'openid'=>$openid,//用户id
+                    'MsgType'=>$data->MsgType,//l类型
+                    'file_url'=>$file_name,//文件路径信息
+                    'MsgId'=>$data->MsgId,//msgId
+                    'MediaId'=>$data->MediaId
+                ];
+                $imageInfo=wximage::insertGetId($c_arr);
+                var_dump($imageInfo);
+            }
 
 
             if($event=='subscribe'){
@@ -179,15 +191,15 @@ class UserController extends Controller
     }
     //图片素材
     public function WxImage($media_id){
-    //调用素材接口
-    $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
-    //获取文件名
-    $Client=new Client();
-    $response = $Client->get($url);
-    $file_info = $response->getHeader('Content-disposition'); //通过第三方类库获取文件的详细信息
-    $file_name = substr(rtrim($file_info[0],'"'),-20); //把图片多余的符号去除并截取
+        //调用素材接口
+        $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
+        //获取文件名
+        $Client=new Client();
+        $response = $Client->get($url);
+        $file_info = $response->getHeader('Content-disposition'); //通过第三方类库获取文件的详细信息
+        $file_name = substr(rtrim($file_info[0],'"'),-20); //把图片多余的符号去除并截取
         $file_url='/wx/image/'.$file_name; //图片的路径+图片
-   //保存图片
+        //保存图片
         $imgInfo=Storage::disk('local')->put($file_url,$response->getBody());
 //        if($imgInfo){
 //            echo 1;
@@ -196,7 +208,7 @@ class UserController extends Controller
 //        }
         return $file_name;
 
-}
+    }
     //语音素材
     public function Wxyy($media_id){
         $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
