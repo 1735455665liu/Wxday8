@@ -53,7 +53,7 @@ class UserController extends Controller
                 ];
                 $textInfo=wxtext::insertGetId($a_arr);
                 //自动回复天气
-                if(strpos($data->Content,"＋天气")){
+                if(strpos($data->Content,"+天气")){
                     //获取城市名字
                     $city=explode('+',$data->Content)[0];
 //                    echo "city :".$city;
@@ -61,9 +61,8 @@ class UserController extends Controller
                     $url="https://api.seniverse.com/v3/weather/now.json?key=SeZT72UG_JcAfRdxv&location=$city&language=zh-Hans&unit=c";
                         $name=file_get_contents($url);
                     $file_name=json_decode($name,true);
-
-                    if(isset($file_name['results']['now'])){
-                        $bjname=$file_name['results'][0]['location']['name'];//地区名称
+                    if(isset($file_name['results'][0]['now'])){
+                        $c_city=$file_name['results'][0]['location']['name'];//地区名称
                         $path=$file_name['results'][0]['location']['path'];//具体地址
                         $t_text=$file_name['results'][0]['now']['text'];//天气清空
                         $temperature=$file_name['results'][0]['now']['temperature'];//摄氏度
@@ -72,7 +71,7 @@ class UserController extends Controller
                               <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
                               <CreateTime>'.time().'</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
-                              <Content><![CDATA['.'城市'.'$city'.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
+                              <Content><![CDATA['.'城市'.$c_city.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
                         </xml>';
                     }else{
                         echo '<xml>
@@ -80,7 +79,7 @@ class UserController extends Controller
                               <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
                               <CreateTime>'.time().'</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
-                              <Content><![CDATA['.'此城市天气情况正在路上'.']></Content>
+                              <Content><![CDATA['.'此城市天气情况正在路上'.']]></Content>
                         </xml>';
                     }
 
