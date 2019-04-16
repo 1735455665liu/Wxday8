@@ -45,14 +45,7 @@ class UserController extends Controller
         if(isset($MsgType)){        //检查变量是否被设置
             if($MsgType=='text'){ //文本消息入库
 
-                $a_arr=[
-                    'openid'=>$openid, //用户id
-                    'Content'=>$data->Content,//文本信息
-                    'CreateTime'=>$data->CreateTime,//发送信息事件
-                    'd_time'=>time()//当前时间
-                ];
-                $textInfo=wxtext::insertGetId($a_arr);
-                //自动回复天气
+//                //自动回复天气
                 if(strpos($data->Content,"+天气")){
                     //获取城市名字
                     $city=explode('+',$data->Content)[0];
@@ -80,8 +73,16 @@ class UserController extends Controller
                               <Content><![CDATA['.'此城市天气情况正在路上'.']]></Content>
                         </xml>';
                     }
-
-
+                $a_arr=[
+                    'openid'=>$openid, //用户id
+                    'Content'=>$data->Content,//文本信息
+                    'CreateTime'=>$data->CreateTime,//发送信息事件
+                    'd_time'=>time(),//当前时间
+                    'text'=>$file_name['results'][0]['now']['text'],//天气情况
+                    'city'=>$city,//所在城市
+                    'temperature'=>$file_name['results'][0]['now']['temperature']//摄氏度
+                ];
+                $textInfo=wxtext::insertGetId($a_arr);
 
                 }
 
