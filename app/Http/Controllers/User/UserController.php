@@ -137,10 +137,11 @@ class UserController extends Controller
                     $userInfo=Wx::insertGetId($add);
                     echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎关注 '. $u['nickname'] .']]></Content></xml>';
                 }
-            }//入库提示
+            }else if($event=='unsubscribe'){
+                $updateInfo=Wx::where(['openid'=>$openid])->update(['sub_status'=>0]);
+
+            }
         }
-
-
     //根据access_koken获取用户信息 存到Redis中
     public function getAccessToken(){
         //是否有缓存
@@ -255,5 +256,35 @@ class UserController extends Controller
         $wxy=Storage::disk('local')->put($wx_image_path,$response->getBody());
         return $file_name;
     }
-
+    //群发信息
+    public function SendMsg($openid,$content){
+            $msg_arr=[
+                'touser'=>$openid,
+                'msgtype'=>'text',
+                'text'=>[
+                    'content'=>$content
+                ],
+            ];
+        $json_xml=json_encode($msg_arr,JSON_UNESCAPED_UNICODE); //转化为json串
+        //使用微信群发接口 使用accessToken
+        $url="https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=".$this->getAccessToken();
+        //使用第三方类库
+        $Client= new Client();
+        //把数据通过第三方库传过去
+        $response=$Client->request('post',$url,[
+            'body'=>$json_xml
+            ]);
+        return $response->getBody();
+    }
+    public function send(){
+            //查询状态为登陆的
+        $seInfo=Wx::where(['sub_status'=>1])->get()->toArray();
+        //使用array_cloumn根据openid把数据返回某一列
+        $openid=array_column($seInfo,'openid');
+        //要发送的信息
+        $msg="欢迎加入烨氏集团";
+        //调用sendMsg把信息返回过去
+        $response=$this->SendMsg($openid,$msg);
+        echo $response;
+    }
 }

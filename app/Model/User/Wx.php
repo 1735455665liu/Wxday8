@@ -8,4 +8,5 @@ class Wx extends Model
 {
     protected $primaryKey='id';
     protected $table="p_wx_users";
+    public $timestamps = false;
 }

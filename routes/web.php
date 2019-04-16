@@ -28,4 +28,7 @@ Route::post('WxImage','User\UserController@WxImage');//图片素材
 Route::post('Wxyy','User\UserController@wxyy');//语音素材
 
 
+Route::post('SendMsg','User\UserController@SendMsg');//群发信息
+Route::get('send','User\UserController@send');
+
 
