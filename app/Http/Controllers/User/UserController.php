@@ -59,11 +59,9 @@ class UserController extends Controller
 //                    echo "city :".$city;
                     //接口地址
                     $url="https://api.seniverse.com/v3/weather/now.json?key=SeZT72UG_JcAfRdxv&location=$city&language=zh-Hans&unit=c";
-                        $name=file_get_contents($url);
+                    $name=file_get_contents($url);
                     $file_name=json_decode($name,true);
                     if(isset($file_name['results'][0]['now'])){
-                        $c_city=$file_name['results'][0]['location']['name'];//地区名称
-                        $path=$file_name['results'][0]['location']['path'];//具体地址
                         $t_text=$file_name['results'][0]['now']['text'];//天气清空
                         $temperature=$file_name['results'][0]['now']['temperature'];//摄氏度
                         echo '<xml>
@@ -71,7 +69,7 @@ class UserController extends Controller
                               <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
                               <CreateTime>'.time().'</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
-                              <Content><![CDATA['.'城市'.$c_city.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
+                              <Content><![CDATA['.'城市'.$city.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
                         </xml>';
                     }else{
                         echo '<xml>
