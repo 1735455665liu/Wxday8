@@ -68,16 +68,16 @@ class UserController extends Controller
                         $t_text=$file_name['results'][0]['now']['text'];//天气清空
                         $temperature=$file_name['results'][0]['now']['temperature'];//摄氏度
                         echo '<xml>
-                              <ToUserName><![CDATA[".$openid."]]></ToUserName>
-                              <FromUserName><![CDATA[".$wx_id."]]></FromUserName>
+                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
+                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
                               <CreateTime>'.time().'</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
                               <Content><![CDATA['.'城市'.'$city'.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
                         </xml>';
                     }else{
                         echo '<xml>
-                              <ToUserName><![CDATA[".$openid."]]></ToUserName>
-                              <FromUserName><![CDATA[".$wx_id."]]></FromUserName>
+                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
+                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
                               <CreateTime>'.time().'</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
                               <Content><![CDATA['.'此城市天气情况正在路上'.']></Content>
