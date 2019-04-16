@@ -53,7 +53,7 @@ class UserController extends Controller
                 ];
                 $textInfo=wxtext::insertGetId($a_arr);
                 //自动回复天气
-                if(strpos($data->Content,'+天气')){
+                if(strpos($data->Content,"＋天气")){
                     //获取城市名字
                     $city=explode('+',$data->Content)[0];
 //                    echo "city :".$city;
