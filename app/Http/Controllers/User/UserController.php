@@ -136,7 +136,9 @@ class UserController extends Controller
                     ];
                     $userInfo=Wx::insertGetId($add);
                     echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎关注 '. $u['nickname'] .']]></Content></xml>';
+
                 }
+                $updateInfo=Wx::where(['openid'=>$openid])->update(['sub_status'=>1]);
             }else if($event=='unsubscribe'){
                 $updateInfo=Wx::where(['openid'=>$openid])->update(['sub_status'=>0]);
 
