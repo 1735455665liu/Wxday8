@@ -35,7 +35,6 @@ class UserController extends Controller
 //        echo 'MsgType: '. $data->MsgType;echo '</br>';              // 消息类型
 //        echo 'Event: '. $data->Event;echo '</br>';                  // 事件类型
 //        echo 'EventKey: '. $data->EventKey;echo '</br>';
-//        die;
         $wx_id = $data->ToUserName;             // 公众号ID
         $openid = $data->FromUserName;         //用户OpenID
         $event = $data->Event;                 //事件类型
@@ -43,8 +42,9 @@ class UserController extends Controller
         $media_id=$data->MediaId;               //媒体文件id
 
 //        消息类型
-        if(isset($MsgType)){
+        if(isset($MsgType)){        //检查变量是否被设置
             if($MsgType=='text'){ //文本消息入库
+
                 $a_arr=[
                     'openid'=>$openid, //用户id
                     'Content'=>$data->Content,//文本信息
@@ -52,6 +52,43 @@ class UserController extends Controller
                     'd_time'=>time()//当前时间
                 ];
                 $textInfo=wxtext::insertGetId($a_arr);
+                //自动回复天气
+                if(strpos($data->Content,'+天气')){
+                    //获取城市名字
+                    $city=explode('+',$data->Content)[0];
+//                    echo "city :".$city;
+                    //接口地址
+                    $url="https://api.seniverse.com/v3/weather/now.json?key=SeZT72UG_JcAfRdxv&location=$city&language=zh-Hans&unit=c";
+                        $name=file_get_contents($url);
+                    $file_name=json_decode($name,true);
+
+                    if(isset($file_name['results']['now'])){
+                        $bjname=$file_name['results'][0]['location']['name'];//地区名称
+                        $path=$file_name['results'][0]['location']['path'];//具体地址
+                        $t_text=$file_name['results'][0]['now']['text'];//天气清空
+                        $temperature=$file_name['results'][0]['now']['temperature'];//摄氏度
+                        echo '<xml>
+                              <ToUserName><![CDATA[".$openid."]]></ToUserName>
+                              <FromUserName><![CDATA[".$wx_id."]]></FromUserName>
+                              <CreateTime>'.time().'</CreateTime>
+                              <MsgType><![CDATA[text]]></MsgType>
+                              <Content><![CDATA['.'城市'.'$city'.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
+                        </xml>';
+                    }else{
+                        echo '<xml>
+                              <ToUserName><![CDATA[".$openid."]]></ToUserName>
+                              <FromUserName><![CDATA[".$wx_id."]]></FromUserName>
+                              <CreateTime>'.time().'</CreateTime>
+                              <MsgType><![CDATA[text]]></MsgType>
+                              <Content><![CDATA['.'此城市天气情况正在路上'.']></Content>
+                        </xml>';
+                    }
+
+
+
+                }
+
+
             }else if($MsgType=='voice'){    //语音入库
                 $file_name=$this->Wxyy($media_id); //语音的信息
                 $b_arr=[
@@ -74,7 +111,10 @@ class UserController extends Controller
                     'MediaId'=>$data->MediaId
                 ];
                 $imageInfo=wximage::insertGetId($c_arr);
-                var_dump($imageInfo);
+            }
+
+
+
             }
 
 
@@ -102,7 +142,7 @@ class UserController extends Controller
             }//入库提示
         }
 
-    }
+
     //根据access_koken获取用户信息 存到Redis中
     public function getAccessToken(){
         //是否有缓存
@@ -201,19 +241,15 @@ class UserController extends Controller
         $file_url='/wx/image/'.$file_name; //图片的路径+图片
         //保存图片
         $imgInfo=Storage::disk('local')->put($file_url,$response->getBody());
-//        if($imgInfo){
-//            echo 1;
-//        }else{
-//            echo  2;
-//        }
-        return $file_name;
+        return $file_name;  //把路径返回回去
 
     }
     //语音素材
     public function Wxyy($media_id){
+        //调用接口
         $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
-        $client=new Client();
-        $response=$client->get($url);
+        $client=new Client();//引用第三方类库
+        $response=$client->get($url); //通过第三类库获取
         $fileinfo=$response->getHeader('Content-disposition');
         $file_name=rtrim(substr($fileinfo[0],-20),'"');
         $wx_image_path = 'wx/images/'.$file_name;

@@ -22,11 +22,8 @@ Route::post('valid','User\UserController@wxEvent');
 Route::get('getAccessToken','User\UserController@getAccessToken');
 //测试
 Route::get('test','User\UserController@test');
-
 //公众号菜单
 Route::post('createMenu','User\UserController@createMenu');
-
-
 Route::post('WxImage','User\UserController@WxImage');//图片素材
 Route::post('Wxyy','User\UserController@wxyy');//语音素材
 
