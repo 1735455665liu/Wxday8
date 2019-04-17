@@ -36,7 +36,7 @@ Route::get('send','User\UserController@send');  //群发请求
 
 
 Route::get('wx/test','Wx\WxPayController@t_test');  //扫码支付
-Route::post('/weixin/pay/notify','Wx\WxPayController@notify');  //请求回调
+Route::get('/weixin/pay/notify','Wx\WxPayController@notify');  //请求回调
 
 
 
