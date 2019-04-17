@@ -14,6 +14,9 @@
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/info', function () {
+    phpinfo();
+});
 //微信首次接入
 Route::get('valid','User\UserController@valid');
 //接收微信服务器推送事件
@@ -29,6 +32,11 @@ Route::post('Wxyy','User\UserController@wxyy');//语音素材
 
 
 Route::post('SendMsg','User\UserController@SendMsg');//群发信息
-Route::get('send','User\UserController@send');
+Route::get('send','User\UserController@send');  //群发请求
+
+
+Route::get('wx/test','Wx\WxPayController@t_test');  //扫码支付
+Route::post('/weixin/pay/notify','Wx\WxPayController@t_test');  //请求回调
+
 
 
