@@ -288,6 +288,5 @@ class UserController extends Controller
         //调用sendMsg把信息返回过去
         $response=$this->SendMsg($openid,$msg);
         echo $response;
-        
     }
 }
