@@ -15,6 +15,7 @@
 <img src="" alt="" id="imgs1">
 <hr>
 <img src="" alt="" id="imgs2">
+<hr>
 
 {{--调用JSSDK接口--}}
 <script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js "></script>
@@ -43,10 +44,23 @@
                 var img ='';
                 $.each(localIds,function (i,v) {
                     img +=v+',';
+                    var node="#imgs"+i;
+                    $(node).attr('src',v);
+
+                    //上传图片
+                    wx.uploadImage({
+                        localId: v, // 需要上传的图片的本地ID，由chooseImage接口获得
+                        isShowProgressTips: 1, // 默认为1，显示进度提示
+                        success: function (res1) {
+                            var serverId = res1.serverId; // 返回图片的服务器端ID
+                            alert('serverID: '+ serverId);
+                            // console.log(res1);
+                        }
+                    });
                 })
-                console.log(img);
             }
         });
+
        })
     })
 </script>
