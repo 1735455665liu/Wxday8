@@ -9,7 +9,7 @@
 </head>
 <body>
 <button id="btn1">选择照片</button>
-
+<hr>
 <img src="" alt="" id="imgs0" width="300">
 <hr>
 <img src="" alt="" id="imgs1"  width="300">
@@ -54,6 +54,9 @@
                             alert('serverId:'+serverId);
                         }
                     });
+
+
+
                 })
             }
         });
