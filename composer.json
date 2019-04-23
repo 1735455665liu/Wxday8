@@ -45,10 +45,13 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"
-        }
     },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
+    "files": [
+        "app/Helper/functions.php"
+    ]
+},
+"minimum-stability": "dev",
+"prefer-stable": true,
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
