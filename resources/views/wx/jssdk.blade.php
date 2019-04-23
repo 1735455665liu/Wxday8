@@ -27,7 +27,7 @@
         timestamp:"{{$js_jssdk['timestamp']}}", // 必填，生成签名的时间戳
         nonceStr: "{{$js_jssdk['nonceStr']}}", // 必填，生成签名的随机串
         signature: "{{$js_jssdk['signature']}}",// 必填，签名
-        jsApiList: ['chooseImage'] // 必填，需要使用的JS接口列表
+        jsApiList: ['chooseImage','uploadImage'] // 必填，需要使用的JS接口列表
     });
 
     //自动加载
@@ -46,7 +46,6 @@
                     img +=v+',';
                     var node="#imgs"+i;
                     $(node).attr('src',v);
-
                     //上传图片
                     wx.uploadImage({
                         localId: v, // 需要上传的图片的本地ID，由chooseImage接口获得
