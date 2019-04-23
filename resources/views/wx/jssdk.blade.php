@@ -54,9 +54,13 @@
                             alert('serverId:'+serverId);
                         }
                     });
-
-
-
+                    $.ajax({
+                        url:"getimg?img"+img,
+                        type:'get',
+                        success:function (res) {
+                            console.log(res);
+                        }
+                    })
                 })
             }
         });

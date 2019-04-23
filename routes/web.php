@@ -41,6 +41,7 @@ Route::post('/weixin/pay/notify','Wx\WxPayController@notify');  //请求回调
 
 
 Route::get('/jssdk','jssdk\jssdkController@jssdk');  //jssdk
+Route::get('/getimg','jssdk\jssdkController@getimg');  //接受数据
 
 
 
