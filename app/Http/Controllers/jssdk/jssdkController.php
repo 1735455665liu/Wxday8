@@ -20,7 +20,7 @@ class jssdkController extends Controller
 
 
         //计算拼接签名
-        $strsha="jsapi_ticket=$ticket&timestamp=$timestamp&nonceStr=$nonceStr&signature=$url";
+        $strsha="jsapi_ticket=$ticket&nonceStr=$nonceStr&timestamp=$timestamp&signature=$url";
         //加密签名
         $sign=sha1($strsha);
         $js_jssdk=[
