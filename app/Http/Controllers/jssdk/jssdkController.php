@@ -31,6 +31,7 @@ class jssdkController extends Controller
         return view('wx.jssdk',$data);
     }
 
-
-
+    public function getimg(){
+        echo "<pre>";print_r($_GET);echo '<pre>';
+    }
 }
