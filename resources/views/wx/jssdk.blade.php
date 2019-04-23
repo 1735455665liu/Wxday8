@@ -8,18 +8,16 @@
     <title>Document</title>
 </head>
 <body>
+<button id="btn1">选择照片</button>
 
+<img src="" alt="" id="imgs0" width="300">
+<hr>
+<img src="" alt="" id="imgs1"  width="300">
+<hr>
+<img src="" alt="" id="imgs2"  width="300">
 
-<button id="btu">上传照片</button>
-<img src="" alt="" id="imgs0">
-<hr>
-<img src="" alt="" id="imgs1">
-<hr>
-<img src="" alt="" id="imgs2">
-<hr>
-{{--调用JSSDK接口--}}
+<script src="/js/jquery/jquery-1.12.4.min.js"></script>
 <script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js "></script>
-<srcipt src="js/jquery/jquery-1.12.4.min.js"></srcipt>
 <script>
     wx.config({
         debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
@@ -31,9 +29,9 @@
     });
 
     //自动加载
-    wx.read(function(){
+    wx.ready(function(){
 
-    $("#btu").click(function () {
+        $("#btn1").click(function(){
         wx.chooseImage({
             count: 3, // 默认9
             sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
@@ -53,6 +51,7 @@
                         isShowProgressTips: 1, // 默认为1，显示进度提示
                         success: function (res) {
                             var serverId = res.serverId; // 返回图片的服务器端ID
+                            alert('serverId:'+serverId);
                         }
                     });
                 })
