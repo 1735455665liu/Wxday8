@@ -7,11 +7,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Str;
 class jssdkController extends Controller
 {
-    //
-
     //签名jssdk
     public function jssdk(){
-
         $ticket=getsign();   //jsdk签名
         $timestamp=time();  //当前时间
         $nonceStr=Str::random(10);//随机字符串
@@ -30,8 +27,15 @@ class jssdkController extends Controller
         ];
         return view('wx.jssdk',$data);
     }
-
+   //获取图片信息
     public function getimg(){
-        echo "<pre>";print_r($_GET);echo '<pre>';
+        $content=file_get_contents('php://input');
+        var_dump($content);
+//        $media_id=$_GET['media_id'];
+//        var_dump($media_id);die;
+//        $url="";
+
+
+//        echo "<pre>";print_r($_GET);echo '<pre>';
     }
 }
