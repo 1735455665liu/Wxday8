@@ -9,7 +9,7 @@ class jssdkController extends Controller
 {
     //
 
-
+    //签名jssdk
     public function jssdk(){
 
         $ticket=getsign();   //jsdk签名
@@ -30,4 +30,7 @@ class jssdkController extends Controller
         ];
         return view('wx.jssdk',$data);
     }
+
+
+
 }

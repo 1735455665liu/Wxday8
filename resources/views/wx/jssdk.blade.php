@@ -8,6 +8,14 @@
     <title>Document</title>
 </head>
 <body>
+<button id="but">上传照片</button>
+
+<img src="" alt="" id="imgs0">
+<hr>
+<img src="" alt="" id="imgs1">
+<hr>
+<img src="" alt="" id="imgs2">
+
 {{--调用JSSDK接口--}}
 <script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js "></script>
 <srcipt src="js/jquery/jquery-1.12.4.min.js"></srcipt>
@@ -21,15 +29,26 @@
         jsApiList: ['chooseImage'] // 必填，需要使用的JS接口列表
     });
 
+    //自动加载
+    wx.read(function(){
 
-    wx.chooseImage({
-        count: 3, // 默认9
-        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-        success: function (res) {
-            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-        }
-    });
+    $('#btu').click(function () {
+        wx.chooseImage({
+            count: 3, // 默认9
+            sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+            sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+            success: function (res) {
+                var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+                //循环把图片展示出来
+                var img ='';
+                $.each(localIds,function (i,v) {
+                    img +=v+',';
+                })
+                console.log(img);
+            }
+        });
+       })
+    })
 </script>
 
 
