@@ -29,9 +29,10 @@ class jssdkController extends Controller
     }
    //获取图片信息
     public function getimg(){
+        $media_id=$_GET['media_id'];
+
         $content=file_get_contents('php://input');
         var_dump($content);
-//        $media_id=$_GET['media_id'];
 //        var_dump($media_id);die;
 //        $url="";
 
