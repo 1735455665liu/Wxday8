@@ -30,7 +30,23 @@ function Getasstoken(){
 //计算签名
 function getsign(){
 
-
+    $key="ticket";
+    //获取access_token
+   $keyticket=Redis::get($key);
+   if($keyticket){
+       return $keyticket;     //如果有就存到缓存中
+   }else{
+       $accesstoken=Getasstoken();
+       $url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token='.$accesstoken.'&type=jsapi';
+       $reposen=json_decode(file_get_contents($url),true); //转换为数组
+        if(isset($reposen['ticket'])){
+            Redis::set($key,$reposen['ticket']);    //存入缓存
+            Redis::expire($key,3600);   //过期时间为3600秒
+            return $reposen['ticket'];
+        }else{
+            return false;
+        }
+   }
 
 }
 
