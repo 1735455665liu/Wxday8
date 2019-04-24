@@ -44,15 +44,6 @@ class UserController extends Controller
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
         $media_id = $data->MediaId;               //媒体文件id
-//        var_dump($media_id);die;
-        $contents="
-            真正的友情不依靠什么/:B-)。'\n'
-            不依靠事业、祸福和身份/:<@，'\n'
-            拒绝契约，它是独立人格之间的互相呼应和确认/:heart。'\n'
-            要想活得更加自在的那些人'\n'
-            就加入我们集团把/:,@f
-        ";
-
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
@@ -127,28 +118,7 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
-//                    $arr_jssdk=[
-//                        'openid'=>$openid, //用户id
-//                        'title'=>$title,//标题
-//                        'textarea'=>$textarea,//描述
-//                        't_time'=>time(),//当前时间
-//                        'url'=>$url,
-//                        'picurl'=>$picurl
-//                    ];
-//                    $jssdk=jssdk::insertGetId($arr_jssdk);
                 }
-
-                if($data->Content){
-                    echo ' <xml>
-                          <ToUserName><![CDATA[' . $wx_id . ']]></ToUserName>
-                          <FromUserName><![CDATA[' . $openid . ']]></FromUserName>
-                          <CreateTime>time()</CreateTime>
-                          <MsgType><![CDATA[text]]></MsgType>
-                          <Content><![CDATA[' . $contents . ']]></Content>
-                     </xml>';
-                }
-
-
             } else if ($MsgType == 'voice') {    //语音入库
                 $file_name = $this->Wxyy($media_id); //语音的信息
                 $b_arr = [
@@ -199,8 +169,8 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
-            }
         }
+    }
     //根据access_koken获取用户信息 存到Redis中
     public function getAccessToken(){
         //是否有缓存
@@ -317,13 +287,13 @@ class UserController extends Controller
     }
     //群发信息
     public function SendMsg($openid,$content){
-            $msg_arr=[
-                'touser'=>$openid,
-                'msgtype'=>'text',
-                'text'=>[
-                    'content'=>$content
-                ],
-            ];
+        $msg_arr=[
+            'touser'=>$openid,
+            'msgtype'=>'text',
+            'text'=>[
+                'content'=>$content
+            ],
+        ];
         $json_xml=json_encode($msg_arr,JSON_UNESCAPED_UNICODE); //转化为json串
         //使用微信群发接口 使用accessToken
         $url="https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=".$this->getAccessToken();
@@ -332,11 +302,11 @@ class UserController extends Controller
         //把数据通过第三方库传过去
         $response=$Client->request('post',$url,[
             'body'=>$json_xml
-            ]);
+        ]);
         return $response->getBody();
     }
     public function send(){
-            //查询状态为登陆的
+        //查询状态为登陆的
         $seInfo=Wx::where(['sub_status'=>1])->get()->toArray();
         //使用array_cloumn根据openid把数据返回某一列
         $openid=array_column($seInfo,'openid');
