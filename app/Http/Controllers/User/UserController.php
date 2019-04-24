@@ -338,7 +338,8 @@ class UserController extends Controller
     }
     //微信回调
     public function repson(){
-
+        echo "<pre>";print_r($_GET);echo '<pre>';
+//        $url='appid='.env('WX_APP_ID').'&redirect_uri=http%3A%2F%2F1809liuziye.comcto.com%2Fwxweb%2Fu&response_type=code&scope=SCOPE&state=STATE#wechat_redirect';
 
     }
 

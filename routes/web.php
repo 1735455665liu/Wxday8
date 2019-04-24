@@ -17,6 +17,8 @@ Route::get('/', function () {
 Route::get('/info', function () {
     phpinfo();
 });
+
+//获取回调地址
 Route::get('/wx/authorize', function () {
     echo urlencode($_GET['url']);
 });
