@@ -30,7 +30,6 @@
 
     //自动加载
     wx.ready(function(){
-
         $("#btn1").click(function(){
         wx.chooseImage({
             count: 3, // 默认9
