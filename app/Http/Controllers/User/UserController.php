@@ -153,7 +153,7 @@ class UserController extends Controller
 
         }else{
             //通过Taccess_token获取信息
-            $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.env('WX_APPID').'&secret='.env('WX_APPSECRET');
+            $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.env('WX_APP_ID').'&secret='.env('WX_APP_SECRET');
             $response=file_get_contents($url);
             $arr=json_decode($response,true);
             //设置

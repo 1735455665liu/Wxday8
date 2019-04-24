@@ -12,4 +12,7 @@ yarn-error.log
 public/logs/wx_event.log
 .ssh
 .ssh.pub
+<<<<<<< HEAD
 .gitignore
+=======
+>>>>>>> liuziye
