@@ -29,8 +29,8 @@ class UserController extends Controller
 //       echo $content;die;
         $time = date('Y-m-d H:i:s');
         $str = $time . $content . "\n";
-        file_put_contents("logs/wx_event.log",$str,FILE_APPEND);
-        $data=simplexml_load_string($content);
+        file_put_contents("logs/wx_event.log", $str, FILE_APPEND);
+        $data = simplexml_load_string($content);
 //        echo 'ToUserName: '. $data->ToUserName;echo '</br>';        // 公众号ID
 //        echo 'FromUserName: '. $data->FromUserName;echo '</br>';    // 用户OpenID
 //        echo 'CreateTime: '. $data->CreateTime;echo '</br>';        // 时间戳
@@ -43,95 +43,95 @@ class UserController extends Controller
         $openid = $data->FromUserName;         //用户OpenID
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
-        $media_id=$data->MediaId;               //媒体文件id
+        $media_id = $data->MediaId;               //媒体文件id
 //        var_dump($media_id);die;
-//        $contents="
-//            真正的友情不依靠什么/:B-)。'\n'
-//            不依靠事业、祸福和身份/:<@，'\n'
-//            拒绝契约，它是独立人格之间的互相呼应和确认/:heart。'\n'
-//            要想活得更加自在的那些人'\n'
-//            就加入我们集团把/:,@f
-//        ";
+        $contents="
+            真正的友情不依靠什么/:B-)。'\n'
+            不依靠事业、祸福和身份/:<@，'\n'
+            拒绝契约，它是独立人格之间的互相呼应和确认/:heart。'\n'
+            要想活得更加自在的那些人'\n'
+            就加入我们集团把/:,@f
+        ";
 
 //        消息类型
-        if(isset($MsgType)){        //检查变量是否被设置
-//            if($MsgType=='text'){ //文本消息入库
-//                   echo ' <xml>
-//                          <ToUserName><![CDATA['.$wx_id.']]></ToUserName>
-//                          <FromUserName><![CDATA['.$openid.']]></FromUserName>
-//                          <CreateTime>time()</CreateTime>
-//                          <MsgType><![CDATA[text]]></MsgType>
-//                          <Content><![CDATA['.$contents.']]></Content>
-//                     </xml>';
+        if (isset($MsgType)) {        //检查变量是否被设置
+            if ($MsgType == 'text') { //文本消息入库
+                echo ' <xml>
+                          <ToUserName><![CDATA[' . $wx_id . ']]></ToUserName>
+                          <FromUserName><![CDATA[' . $openid . ']]></FromUserName>
+                          <CreateTime>time()</CreateTime>
+                          <MsgType><![CDATA[text]]></MsgType>
+                          <Content><![CDATA[' . $contents . ']]></Content>
+                     </xml>';
 //
 
 //                //自动回复天气
-                if(strpos($data->Content,"+天气")){
+                if (strpos($data->Content, "+天气")) {
                     //获取城市名字
-                    $city=explode('+',$data->Content)[0];
+                    $city = explode('+', $data->Content)[0];
 //                    echo "city :".$city;
                     //接口地址
-                    $url="https://api.seniverse.com/v3/weather/now.json?key=SeZT72UG_JcAfRdxv&location=$city&language=zh-Hans&unit=c";
-                    $name=file_get_contents($url);
-                    $file_name=json_decode($name,true);
-                    if(isset($file_name['results'][0]['now'])){
-                        $t_text=$file_name['results'][0]['now']['text'];//天气清空
-                        $temperature=$file_name['results'][0]['now']['temperature'];//摄氏度
+                    $url = "https://api.seniverse.com/v3/weather/now.json?key=SeZT72UG_JcAfRdxv&location=$city&language=zh-Hans&unit=c";
+                    $name = file_get_contents($url);
+                    $file_name = json_decode($name, true);
+                    if (isset($file_name['results'][0]['now'])) {
+                        $t_text = $file_name['results'][0]['now']['text'];//天气清空
+                        $temperature = $file_name['results'][0]['now']['temperature'];//摄氏度
                         echo '<xml>
-                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
-                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
-                              <CreateTime>'.time().'</CreateTime>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>' . time() . '</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
-                              <Content><![CDATA['.'城市'.$city.'天气情况'.$t_text.'.摄氏度'.$temperature.']]></Content>
+                              <Content><![CDATA[' . '城市' . $city . '天气情况' . $t_text . '.摄氏度' . $temperature . ']]></Content>
                         </xml>';
-                    }else{
+                    } else {
                         echo '<xml>
-                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
-                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
-                              <CreateTime>'.time().'</CreateTime>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>' . time() . '</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
-                              <Content><![CDATA['.'此城市天气情况正在路上'.']]></Content>
+                              <Content><![CDATA[' . '此城市天气情况正在路上' . ']]></Content>
                         </xml>';
                     }
-                $a_arr=[
-                    'openid'=>$openid, //用户id
-                    'Content'=>$data->Content,//文本信息
-                    'CreateTime'=>$data->CreateTime,//发送信息事件
-                    'd_time'=>time(),//当前时间
-                    'text'=>$file_name['results'][0]['now']['text'],//天气情况
-                    'city'=>$city,//所在城市
-                    'temperature'=>$file_name['results'][0]['now']['temperature']//摄氏度
-                ];
-                $textInfo=wxtext::insertGetId($a_arr);
+                    $a_arr = [
+                        'openid' => $openid, //用户id
+                        'Content' => $data->Content,//文本信息
+                        'CreateTime' => $data->CreateTime,//发送信息事件
+                        'd_time' => time(),//当前时间
+                        'text' => $file_name['results'][0]['now']['text'],//天气情况
+                        'city' => $city,//所在城市
+                        'temperature' => $file_name['results'][0]['now']['temperature']//摄氏度
+                    ];
+                    $textInfo = wxtext::insertGetId($a_arr);
                 }
 
-                if($data->Content=="最新消息"){
-                    $wx_text="最新消息";
-                        echo '<xml>
-                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
-                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
-                              <CreateTime>'.time().'</CreateTime>
+                if ($data->Content == "最新消息") {
+                    $wx_text = "最新消息";
+                    echo '<xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>' . time() . '</CreateTime>
                               <MsgType><![CDATA[text]]></MsgType>
-                              <Content><![CDATA['."$wx_text".']]></Content>
+                              <Content><![CDATA[' . "$wx_text" . ']]></Content>
                         </xml>';
-                    }else if($data->Content=="最新商品"){
-                        $title="劲爆新闻烨氏集团即将-";//标题
-                        $textarea="集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
-                        $url="http://1809liuziye.comcto.com";
-                        $picurl="http://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg";
-                        echo'
+                } else if ($data->Content == "最新商品") {
+                    $title = "劲爆新闻烨氏集团即将-";//标题
+                    $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
+                    $url = "http://1809liuziye.comcto.com";
+                    $picurl = "http://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg";
+                    echo '
                         <xml>
-                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
-                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
                               <CreateTime>time()</CreateTime>
                               <MsgType><![CDATA[news]]></MsgType>
                               <ArticleCount>1</ArticleCount>
                               <Articles>
                                 <item>
-                                  <Title><![CDATA['.$title.']]></Title>
-                                  <Description><![CDATA['.$textarea.']]></Description>
-                                  <PicUrl><![CDATA['.$picurl.']]></PicUrl>
-                                  <Url><![CDATA['.$url.']]></Url>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
                                 </item>
                               </Articles>
                             </xml>
@@ -147,61 +147,56 @@ class UserController extends Controller
 //                    $jssdk=jssdk::insertGetId($arr_jssdk);
                 }
 
-            }else if($MsgType=='voice'){    //语音入库
-                $file_name=$this->Wxyy($media_id); //语音的信息
-                $b_arr=[
-                    'openid'=>$openid,    //用户id
-                    'msg_type'=>'voice',  // 类型
-                    'mediaid'=>$data->MediaId, //媒体文件id
-                    'format'=>$data->Format,     //后缀
-                    'MsgId'=>$data->MsgId,
-                    'file_url'=>$file_name,
+            } else if ($MsgType == 'voice') {    //语音入库
+                $file_name = $this->Wxyy($media_id); //语音的信息
+                $b_arr = [
+                    'openid' => $openid,    //用户id
+                    'msg_type' => 'voice',  // 类型
+                    'mediaid' => $data->MediaId, //媒体文件id
+                    'format' => $data->Format,     //后缀
+                    'MsgId' => $data->MsgId,
+                    'file_url' => $file_name,
                 ];
                 //入库
-                $fileyyInfo=wxyuyin::insertGetId($b_arr);
-            }else if($MsgType=='image'){
-                $file_name=$this->WxImage($media_id);
-                $c_arr=[
-                  'openid'=>$openid,//用户id
-                    'MsgType'=>$data->MsgType,//l类型
-                    'file_url'=>$file_name,//文件路径信息
-                    'MsgId'=>$data->MsgId,//msgId
-                    'MediaId'=>$data->MediaId
+                $fileyyInfo = wxyuyin::insertGetId($b_arr);
+            } else if ($MsgType == 'image') {
+                $file_name = $this->WxImage($media_id);
+                $c_arr = [
+                    'openid' => $openid,//用户id
+                    'MsgType' => $data->MsgType,//l类型
+                    'file_url' => $file_name,//文件路径信息
+                    'MsgId' => $data->MsgId,//msgId
+                    'MediaId' => $data->MediaId
                 ];
-                $imageInfo=wximage::insertGetId($c_arr);
+                $imageInfo = wximage::insertGetId($c_arr);
             }
-
-
-
-            }
-
-
-            if($event=='subscribe'){
+            if ($event == 'subscribe') {
                 //扫码关注事件  通过查询数据库  做判断
-                $Info=Wx::where(['openid'=>$openid])->first();
-                if($Info){
+                $Info = Wx::where(['openid' => $openid])->first();
+                if ($Info) {
                     //数据库有值 就说明关注过
-                    echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎回来 '. $Info['nickname'] .']]></Content></xml>';
-                }else{
+                    echo '<xml><ToUserName><![CDATA[' . $openid . ']]></ToUserName><FromUserName><![CDATA[' . $wx_id . ']]></FromUserName><CreateTime>' . time() . '</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[' . '欢迎回来 ' . $Info['nickname'] . ']]></Content></xml>';
+                } else {
                     //没有值 添加入库
-                    $u=$this->getUserInfo($openid);
-                    $add=[
-                        'openid'    => $u['openid'],
-                        'nickname'  => $u['nickname'],
-                        'sex'  => $u['sex'],
-                        'city'  => $u['city'],
-                        'headimgurl'  => $u['headimgurl'],
-                        'province'  => $u['province'],
-                        'country'  => $u['country'],
+                    $u = $this->getUserInfo($openid);
+                    $add = [
+                        'openid' => $u['openid'],
+                        'nickname' => $u['nickname'],
+                        'sex' => $u['sex'],
+                        'city' => $u['city'],
+                        'headimgurl' => $u['headimgurl'],
+                        'province' => $u['province'],
+                        'country' => $u['country'],
                     ];
-                    $userInfo=Wx::insertGetId($add);
-                    echo '<xml><ToUserName><![CDATA['.$openid.']]></ToUserName><FromUserName><![CDATA['.$wx_id.']]></FromUserName><CreateTime>'.time().'</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA['. '欢迎关注 '. $u['nickname'] .']]></Content></xml>';
+                    $userInfo = Wx::insertGetId($add);
+                    echo '<xml><ToUserName><![CDATA[' . $openid . ']]></ToUserName><FromUserName><![CDATA[' . $wx_id . ']]></FromUserName><CreateTime>' . time() . '</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[' . '欢迎关注 ' . $u['nickname'] . ']]></Content></xml>';
 
                 }
-                $updateInfo=Wx::where(['openid'=>$openid])->update(['sub_status'=>1]);
-            }else if($event=='unsubscribe'){
-                $updateInfo=Wx::where(['openid'=>$openid])->update(['sub_status'=>0]);
+                $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 1]);
+            } else if ($event == 'unsubscribe') {
+                $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
+            }
             }
         }
     //根据access_koken获取用户信息 存到Redis中
