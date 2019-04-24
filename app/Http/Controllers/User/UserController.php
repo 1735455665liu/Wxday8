@@ -12,6 +12,7 @@ use App\Model\User\wxtext;
 use App\Model\User\wximage;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 class UserController extends Controller
 {
 
