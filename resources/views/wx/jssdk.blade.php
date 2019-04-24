@@ -16,6 +16,11 @@
 <hr>
 <img src="" alt="" id="imgs2"  width="300">
 
+
+
+
+<h1></h1>
+
 <script src="/js/jquery/jquery-1.12.4.min.js"></script>
 <script src="http://res2.wx.qq.com/open/js/jweixin-1.4.0.js "></script>
 <script>
@@ -25,7 +30,7 @@
         timestamp:"{{$js_jssdk['timestamp']}}", // 必填，生成签名的时间戳
         nonceStr: "{{$js_jssdk['nonceStr']}}", // 必填，生成签名的随机串
         signature: "{{$js_jssdk['signature']}}",// 必填，签名
-        jsApiList: ['chooseImage','uploadImage','updateAppMessageShareData'] // 必填，需要使用的JS接口列表
+        jsApiList: ['chooseImage','uploadImage'] // 必填，需要使用的JS接口列表
     });
 
     //自动加载
@@ -64,19 +69,7 @@
             }
         });
        })
-        //自动加载
-        wx.ready(function () {   //需在用户可能点击分享按钮前就先调用
-            wx.updateAppMessageShareData({
-                title: '烨氏你可以了解一下', // 分享标题
-                desc: '123', // 分享描述
-                link: 'http://1809liuziye.comcto.com/jssdk', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
-                imgUrl: 'http://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg', // 分享图标
-                success: function () {
-                    // 设置成功
-                    alert('恭喜成功');
-                }
-            })
-        })
+
     })
 </script>
 </body>

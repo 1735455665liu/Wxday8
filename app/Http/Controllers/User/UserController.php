@@ -13,6 +13,7 @@ use App\Model\User\wximage;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Model\jssdk;
 class UserController extends Controller
 {
 
@@ -119,6 +120,15 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
+                    $arr_jssdk=[
+                        'openid'=>$openid, //用户id
+                        'title'=>$title,//标题
+                        'textarea'=>$textarea,//描述
+                        't_time'=>time(),//当前时间
+                        'url'=>$url,
+                        'picurl'=>$picurl
+                    ];
+                    $jssdk=jssdk::insertGetId($arr_jssdk);
                 }
             }else if($MsgType=='voice'){    //语音入库
                 $file_name=$this->Wxyy($media_id); //语音的信息
@@ -322,25 +332,25 @@ class UserController extends Controller
         $response=$this->SendMsg($openid,$msg);
         echo $response;
     }
-    //签名jssdk
-//    public function fxjssdk(){
-//        $ticket=getsign();   //jsdk签名
-//        $timestamp=time();  //当前时间
-//        $nonceStr=Str::random(10);//随机字符串
-//        $current_url=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
-//        //计算拼接签名
-//        $string1 = "jsapi_ticket=$ticket&noncestr=$nonceStr&timestamp=$timestamp&url=$current_url";
-//        $sign = sha1($string1);
-//        $js_jssdk=[
-//            "appId"=>env('WX_APP_ID'),//公总号id
-//            "timestamp"=>$timestamp,//生成签名时间戳
-//            "nonceStr"=>$nonceStr,//生成签名的随机字符串
-//            "signature"=>$sign,//签名
-//        ];
-//        $data=[
-//            'js_jssdk'=>$js_jssdk
-//        ];
-//        return view('wx.user',$data);
-//    }
+//    签名jssdk
+    public function fxjssdk(){
+        $ticket=getsign();   //jsdk签名
+        $timestamp=time();  //当前时间
+        $nonceStr=Str::random(10);//随机字符串
+        $current_url=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+        //计算拼接签名
+        $string1 = "jsapi_ticket=$ticket&noncestr=$nonceStr&timestamp=$timestamp&url=$current_url";
+        $sign = sha1($string1);
+        $js_jssdk=[
+            "appId"=>env('WX_APP_ID'),//公总号id
+            "timestamp"=>$timestamp,//生成签名时间戳
+            "nonceStr"=>$nonceStr,//生成签名的随机字符串
+            "signature"=>$sign,//签名
+        ];
+        $data=[
+            'js_jssdk'=>$js_jssdk
+        ];
+        return view('wx.user',$data);
+    }
 
 }
