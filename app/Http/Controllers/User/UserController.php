@@ -35,16 +35,18 @@ class UserController extends Controller
 //        echo 'MsgType: '. $data->MsgType;echo '</br>';              // 消息类型
 //        echo 'Event: '. $data->Event;echo '</br>';                  // 事件类型
 //        echo 'EventKey: '. $data->EventKey;echo '</br>';
+//         echo 'EventKey: '. $data->MediaId;echo '</br>';
+//die;
         $wx_id = $data->ToUserName;             // 公众号ID
         $openid = $data->FromUserName;         //用户OpenID
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
         $media_id=$data->MediaId;               //媒体文件id
+//        var_dump($media_id);die;
 
 //        消息类型
         if(isset($MsgType)){        //检查变量是否被设置
             if($MsgType=='text'){ //文本消息入库
-
 //                //自动回复天气
                 if(strpos($data->Content,"+天气")){
                     //获取城市名字
@@ -83,10 +85,18 @@ class UserController extends Controller
                     'temperature'=>$file_name['results'][0]['now']['temperature']//摄氏度
                 ];
                 $textInfo=wxtext::insertGetId($a_arr);
-
                 }
 
-
+                if($data->Content=="最新消息"){
+                    $wx_text="最新消息";
+                        echo '<xml>
+                              <ToUserName><![CDATA['.$openid.']]></ToUserName>
+                              <FromUserName><![CDATA['.$wx_id.']]></FromUserName>
+                              <CreateTime>'.time().'</CreateTime>
+                              <MsgType><![CDATA[text]]></MsgType>
+                              <Content><![CDATA['."$wx_text".']]></Content>
+                        </xml>';
+                    }
             }else if($MsgType=='voice'){    //语音入库
                 $file_name=$this->Wxyy($media_id); //语音的信息
                 $b_arr=[
@@ -289,4 +299,5 @@ class UserController extends Controller
         $response=$this->SendMsg($openid,$msg);
         echo $response;
     }
+
 }
