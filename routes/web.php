@@ -39,13 +39,12 @@ Route::get('wx/test','Wx\WxPayController@t_test');  //扫码支付
 Route::post('/weixin/pay/notify','Wx\WxPayController@notify');  //请求回调
 
 
-
-Route::get('/jssdk','jssdk\jssdkController@jssdk');  //jssdk
+Route::get('/jssdk','jssdk\jssdkController@jssdk');  //上传图片jssdk
 Route::get('/getimg','jssdk\jssdkController@getimg');  //接受数据
 
 
-Route::post('/wx_text','jssdk\jssdkController@wx_text');  //图文消息
 
+Route::post('/wx_text','jssdk\jssdkController@wx_text');  //图文消息
 
 Route::get('/fxjssdk','User\UserController@fxjssdk');  //分享jssdk
 
