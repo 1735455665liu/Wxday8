@@ -336,5 +336,10 @@ class UserController extends Controller
         ];
         return view('wx.user',$data);
     }
+    //微信回调
+    public function repson(){
+
+
+    }
 
 }

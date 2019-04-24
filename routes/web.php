@@ -17,6 +17,10 @@ Route::get('/', function () {
 Route::get('/info', function () {
     phpinfo();
 });
+Route::get('/wx/authorize', function () {
+    echo urlencode($_GET['url']);
+});
+
 //微信首次接入
 Route::get('valid','User\UserController@valid');
 //接收微信服务器推送事件
@@ -29,22 +33,14 @@ Route::get('test','User\UserController@test');
 Route::post('createMenu','User\UserController@createMenu');
 Route::post('WxImage','User\UserController@WxImage');//图片素材
 Route::post('Wxyy','User\UserController@wxyy');//语音素材
-
-
 Route::post('SendMsg','User\UserController@SendMsg');//群发信息
 Route::get('send','User\UserController@send');  //群发请求
-
-
 Route::get('wx/test','Wx\WxPayController@t_test');  //扫码支付
 Route::post('/weixin/pay/notify','Wx\WxPayController@notify');  //请求回调
-
-
 Route::get('/jssdk','jssdk\jssdkController@jssdk');  //上传图片jssdk
 Route::get('/getimg','jssdk\jssdkController@getimg');  //接受数据
-
-
-
 Route::post('/wx_text','jssdk\jssdkController@wx_text');  //图文消息
-
 Route::get('/fxjssdk','User\UserController@fxjssdk');  //分享jssdk
+Route::get('/wxweb/u','User\UserController@repson');  //微信网页授权回调
+
 
