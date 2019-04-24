@@ -338,8 +338,12 @@ class UserController extends Controller
     }
     //微信回调
     public function repson(){
-    echo '<pre>';print_r($_GET);echo '<pre>';
-
+        echo '<pre>';print_r($_GET);echo '<pre>';
+        //获取code
+        $code=$_GET['code'];
+        $url='https://api.weixin.qq.com/sns/oauth2/access_token?appid='.env('WX_APP_ID').'&secret='.env('WX_APP_SECRET').'&code='.$code.'&grant_type=authorization_code';
+        $fielarr=json_decode(file_get_contents($url));
+        var_dump($fielarr);
     }
 
 }
