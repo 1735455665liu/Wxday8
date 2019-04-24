@@ -322,7 +322,7 @@ class UserController extends Controller
         echo $response;
     }
     //签名jssdk
-    public function jssdk(){
+    public function fxjssdk(){
         $ticket=getsign();   //jsdk签名
         $timestamp=time();  //当前时间
         $nonceStr=Str::random(10);//随机字符串

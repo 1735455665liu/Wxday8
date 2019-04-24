@@ -47,4 +47,5 @@ Route::get('/getimg','jssdk\jssdkController@getimg');  //接受数据
 Route::post('/wx_text','jssdk\jssdkController@wx_text');  //图文消息
 
 
+Route::get('/fxjssdk','jssdk\jssdkController@fxjssdk');  //分享jssdk
 
