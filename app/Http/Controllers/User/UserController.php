@@ -45,13 +45,13 @@ class UserController extends Controller
         $MsgType = $data->MsgType;
         $media_id=$data->MediaId;               //媒体文件id
 //        var_dump($media_id);die;
-        $contents="
-            真正的友情不依靠什么/:B-)。'\n'
-            不依靠事业、祸福和身份/:<@，'\n'
-            拒绝契约，它是独立人格之间的互相呼应和确认/:heart。'\n'
-            要想活得更加自在的那些人'\n'
-            就加入我们集团把/:,@f
-        ";
+//        $contents="
+//            真正的友情不依靠什么/:B-)。'\n'
+//            不依靠事业、祸福和身份/:<@，'\n'
+//            拒绝契约，它是独立人格之间的互相呼应和确认/:heart。'\n'
+//            要想活得更加自在的那些人'\n'
+//            就加入我们集团把/:,@f
+//        ";
 
 //        消息类型
         if(isset($MsgType)){        //检查变量是否被设置
@@ -61,7 +61,7 @@ class UserController extends Controller
                           <FromUserName><![CDATA['.$openid.']]></FromUserName>
                           <CreateTime>time()</CreateTime>
                           <MsgType><![CDATA[text]]></MsgType>
-                          <Content><![CDATA['.$contents.']]></Content>
+                          <Content><![CDATA['111111']]></Content>
                      </xml>';
 
 
