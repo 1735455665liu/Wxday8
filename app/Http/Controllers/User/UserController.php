@@ -367,6 +367,7 @@ class UserController extends Controller
                 'city'=>$user['city'],
                 'province'=>$user['province'],
                 'country'=>$user['country']
+                'headimgurl'=>$user['headimgurl']
             ];
             $Wxusers=Wx::insertGetId($add);
             echo '欢迎关注';
