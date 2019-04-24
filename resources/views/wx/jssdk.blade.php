@@ -25,7 +25,7 @@
         timestamp:"{{$js_jssdk['timestamp']}}", // 必填，生成签名的时间戳
         nonceStr: "{{$js_jssdk['nonceStr']}}", // 必填，生成签名的随机串
         signature: "{{$js_jssdk['signature']}}",// 必填，签名
-        jsApiList: ['chooseImage','uploadImage'] // 必填，需要使用的JS接口列表
+        jsApiList: ['chooseImage','uploadImage','updateAppMessageShareData'] // 必填，需要使用的JS接口列表
     });
 
     //自动加载
@@ -73,6 +73,7 @@
                 imgUrl: 'http://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg', // 分享图标
                 success: function () {
                     // 设置成功
+                    alert('恭喜成功');
                 }
             })
         })
