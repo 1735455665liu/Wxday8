@@ -25,7 +25,7 @@
             wx.updateAppMessageShareData({
                 title: '烨氏你可以了解一下', // 分享标题
                 desc: '123', // 分享描述
-                link: 'http://1809liuziye.comcto.com', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
+                link: 'http://1809liuziye.comcto.com/fxjssdk', // 分享链接，该链接域名或路径必须与当前页面对应的公众号JS安全域名一致
                 imgUrl: 'http://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg', // 分享图标
                 success: function () {
                     // 设置成功
