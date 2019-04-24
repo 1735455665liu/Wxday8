@@ -120,15 +120,15 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
-                    $arr_jssdk=[
-                        'openid'=>$openid, //用户id
-                        'title'=>$title,//标题
-                        'textarea'=>$textarea,//描述
-                        't_time'=>time(),//当前时间
-                        'url'=>$url,
-                        'picurl'=>$picurl
-                    ];
-                    $jssdk=jssdk::insertGetId($arr_jssdk);
+//                    $arr_jssdk=[
+//                        'openid'=>$openid, //用户id
+//                        'title'=>$title,//标题
+//                        'textarea'=>$textarea,//描述
+//                        't_time'=>time(),//当前时间
+//                        'url'=>$url,
+//                        'picurl'=>$picurl
+//                    ];
+//                    $jssdk=jssdk::insertGetId($arr_jssdk);
                 }
             }else if($MsgType=='voice'){    //语音入库
                 $file_name=$this->Wxyy($media_id); //语音的信息
