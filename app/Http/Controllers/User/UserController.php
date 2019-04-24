@@ -338,12 +338,12 @@ class UserController extends Controller
     }
     //微信回调
     public function repson(){
-        echo '<pre>';print_r($_GET);echo '<pre>';
+//        echo '<pre>';print_r($_GET);echo '<pre>';
         //获取code
         $code=$_GET['code'];
         $url='https://api.weixin.qq.com/sns/oauth2/access_token?appid='.env('WX_APP_ID').'&secret='.env('WX_APP_SECRET').'&code='.$code.'&grant_type=authorization_code';
         $response=json_decode(file_get_contents($url),true);
-        echo '<pre>';print_r($response);echo '<pre>';
+//        echo '<pre>';print_r($response);echo '<pre>';
 
 
         //获取用户信息
@@ -351,7 +351,31 @@ class UserController extends Controller
         $openid=$response['openid'];
         $url='https://api.weixin.qq.com/sns/userinfo?access_token='.$access_token.'&openid='.$openid.'&lang=zh_CN';
         $user=json_decode(file_get_contents($url),true);
-        echo '<pre>';print_r($user);echo '<pre>';
+//        echo '<pre>';print_r($user);echo '<pre>';
+
+        $userInfo=Wx::where(['openid'=>$user['openid']])->first();
+        if($userInfo){
+            if($user['openid']==$userInfo->openid){
+                echo '欢迎大哥回来';
+            }
+        }else{
+            //添加入库进行判断
+            $add=[
+                'openid'=>$user['openid'],
+                'nickname'=>$user['nickname'],
+                'sex'=>$user['sex'],
+                'city'=>$user['city'],
+                'province'=>$user['province'],
+                'country'=>$user['country']
+            ];
+            $Wxusers=Wx::insertGetId($add);
+            echo '欢迎关注';
+        }
+
+
+
+
+
 
     }
 
