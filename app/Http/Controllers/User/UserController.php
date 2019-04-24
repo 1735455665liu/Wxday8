@@ -56,15 +56,6 @@ class UserController extends Controller
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
-                echo ' <xml>
-                          <ToUserName><![CDATA[' . $wx_id . ']]></ToUserName>
-                          <FromUserName><![CDATA[' . $openid . ']]></FromUserName>
-                          <CreateTime>time()</CreateTime>
-                          <MsgType><![CDATA[text]]></MsgType>
-                          <Content><![CDATA[' . $contents . ']]></Content>
-                     </xml>';
-//
-
 //                //自动回复天气
                 if (strpos($data->Content, "+天气")) {
                     //获取城市名字
@@ -146,6 +137,17 @@ class UserController extends Controller
 //                    ];
 //                    $jssdk=jssdk::insertGetId($arr_jssdk);
                 }
+
+                if($data->Content){
+                    echo ' <xml>
+                          <ToUserName><![CDATA[' . $wx_id . ']]></ToUserName>
+                          <FromUserName><![CDATA[' . $openid . ']]></FromUserName>
+                          <CreateTime>time()</CreateTime>
+                          <MsgType><![CDATA[text]]></MsgType>
+                          <Content><![CDATA[' . $contents . ']]></Content>
+                     </xml>';
+                }
+
 
             } else if ($MsgType == 'voice') {    //语音入库
                 $file_name = $this->Wxyy($media_id); //语音的信息
