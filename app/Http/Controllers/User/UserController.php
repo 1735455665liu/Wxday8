@@ -365,6 +365,8 @@ class UserController extends Controller
                 'nickname'=>$user['nickname'],
                 'sex'=>$user['sex'],
                 'city'=>$user['city'],
+                'city'=>$user['city'],
+                'city'=>$user['city'],
                 'province'=>$user['province'],
                 'country'=>$user['country'],
                 'headimgurl'=>$user['headimgurl']
