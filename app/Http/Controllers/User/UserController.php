@@ -44,6 +44,8 @@ class UserController extends Controller
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
         $media_id = $data->MediaId;               //媒体文件id
+
+
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
@@ -99,8 +101,8 @@ class UserController extends Controller
                 } else if ($data->Content == "最新商品") {
                     $title = "劲爆新闻烨氏集团即将-";//标题
                     $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
-                    $url = "http://1809liuziye.comcto.com";
-                    $picurl = "http://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg";
+                    $url = "https://1809liuziye.comcto.com";
+                    $picurl = "https://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg";
                     echo '
                         <xml>
                               <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
