@@ -171,49 +171,12 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
-            if($event=='SCAN'){
+            if(isset($event)){
                 //欢迎新用户
-                $this->getimgtext($openid,$wx_id);
-                }else {
-                    if($event == 'subscribe'){
-                        $Info = Wx::where(['openid' => $openid])->first();
-                        if($Info){
-                            $title = "欢迎回来宝贝-";//标题
-                            $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
-                            $url = "https://1809liuziye.comcto.com";
-                            $picurl = "https://1809liuziye.comcto.com/img/123.jpg";
-                            echo '
-                            <xml>
-                                  <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
-                                  <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
-                                  <CreateTime>time()</CreateTime>
-                                  <MsgType><![CDATA[news]]></MsgType>
-                                  <ArticleCount>1</ArticleCount>
-                                  <Articles>
-                                    <item>
-                                      <Title><![CDATA[' . $title . ']]></Title>
-                                      <Description><![CDATA[' . $textarea . ']]></Description>
-                                      <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
-                                      <Url><![CDATA[' . $url . ']]></Url>
-                                    </item>
-                                  </Articles>
-                                </xml>
-                          ';
-                        }else{
-                            //没有值 添加入库
-                            $u = $this->getUserInfo($openid);
-                            $add = [
-                                'openid' => $u['openid'],
-                                'nickname' => $u['nickname'],
-                                'sex' => $u['sex'],
-                                'city' => $u['city'],
-                                'headimgurl' => $u['headimgurl'],
-                                'province' => $u['province'],
-                                'country' => $u['country'],
-                            ];
-                            $userInfo = p_wx_users::insertGetId($add);
-                        }
-                    }
+                if(isset($data->EventKey)){
+                    $this->getimgtext($openid,$data,$wx_id);
+                }
+
             }
         }
     }
@@ -429,7 +392,7 @@ class UserController extends Controller
     }
 
     //扫码推送图文消息
-    public function getimgtext($openid,$wx_id)
+    public function getimgtext($openid,$data,$wx_id)
     {
         //获取token
         $token = $this->getAccessToken();
@@ -449,36 +412,76 @@ class UserController extends Controller
         $ticket_json = json_decode($ticket, true);
         $ticket_arr = $ticket_json['ticket'];
         $url_ticket_arr = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . $ticket_arr . '';
-        $addInfo = [
-            'openid' => $openid,
-            'ticket' => $ticket_json['ticket'],
-            'expire_seconds' => $ticket_json['expire_seconds'],
-            'createtime' => time()
-        ];
-        $add = tmp_wx_users::insertGetId($addInfo);
-        if ($add) {
-            $title = "烨氏集团-";//标题
+        $userInfo=p_wx_users::where(['openid'=>$openid])->first();
+        if($userInfo){  //有 就提示
+            $title = "欢迎回来";//标题
             $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
             $url = "https://1809liuziye.comcto.com";
             $picurl = "https://1809liuziye.comcto.com/img/123.jpg";
             echo '
-                            <xml>
-                                  <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
-                                  <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
-                                  <CreateTime>time()</CreateTime>
-                                  <MsgType><![CDATA[news]]></MsgType>
-                                  <ArticleCount>1</ArticleCount>
-                                  <Articles>
-                                    <item>
-                                      <Title><![CDATA[' . $title . ']]></Title>
-                                      <Description><![CDATA[' . $textarea . ']]></Description>
-                                      <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
-                                      <Url><![CDATA[' . $url . ']]></Url>
-                                    </item>
-                                  </Articles>
-                                </xml>
-                          ';
+                        <xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>time()</CreateTime>
+                              <MsgType><![CDATA[news]]></MsgType>
+                              <ArticleCount>1</ArticleCount>
+                              <Articles>
+                                <item>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
+                                </item>
+                              </Articles>
+                            </xml>
+                      ';
+        }else{          //没有就入库
+            $user=$this->getUserInfo($openid);
+            $addInfo = [
+                'openid'    => $user['openid'],
+                'add_time'    => time(),
+                'nickname'    => $user['nickname'],
+                'sex'    => $user['sex'],
+                'city'    => $user['city'],
+                'province'    => $user['province'],
+                'headimgurl'    => $user['headimgurl'],
+                'subscribe_time'    => $user['subscribe_time'],
+                'scence_id'    => $data->EventKey,
+            ];
+            $add = p_wx_users::insertGetId($addInfo);
+            if($add){
+                $title = "欢迎新用户";//标题
+                $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
+                $url = "https://1809liuziye.comcto.com";
+                $picurl = "https://1809liuziye.comcto.com/img/123.jpg";
+                echo '
+                        <xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>time()</CreateTime>
+                              <MsgType><![CDATA[news]]></MsgType>
+                              <ArticleCount>1</ArticleCount>
+                              <Articles>
+                                <item>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
+                                </item>
+                              </Articles>
+                            </xml>
+                      ';
+
+            }
         }
+
+
+
+
+    }
+
+    public function subscribe($data){
+        var_dump($data);
     }
 
 }
