@@ -14,6 +14,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Model\jssdk;
+use App\Model\tmp_wx_users;
 class UserController extends Controller
 {
 
@@ -44,8 +45,6 @@ class UserController extends Controller
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
         $media_id = $data->MediaId;               //媒体文件id
-
-
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
@@ -171,6 +170,60 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
+            if($event=='SCAN'){
+                //获取token
+                $token=$this->getAccessToken();
+                $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$token.'';
+                $arr=[
+                  "expire_seconds"=>604800,
+                    "action_name"=>"QR_SCENE",
+                    "action_info"=>"scene",
+                        "scene_id"=>999
+                ];
+                $json=json_encode($arr,JSON_UNESCAPED_UNICODE);
+                $clinet=new Client();
+                $response=$clinet->request('post',$url,[
+                    'body'=>$json
+                ]);
+                $ticket=$response->getBody();
+                $ticket_json=json_decode($ticket,true);
+                $ticket_arr=$ticket_json['ticket'];
+                $url_ticket_arr='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$ticket_arr.'';
+                $addInfo=[
+                    'openid'=>$openid,
+                    'ticket'=>$ticket_json['ticket'],
+                    'expire_seconds'=>$ticket_json['expire_seconds'],
+                    'createtime'=>time()
+                ];
+                $add=tmp_wx_users::insertGetId($addInfo);
+
+                $title = "劲爆新闻烨氏集团即将-";//标题
+                $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
+                $url = "https://1809liuziye.comcto.com";
+                $picurl = "https://1809liuziye.comcto.com/img/6ee6ffa61d3ba98dfbba61ee85de93bd.jpg";
+                echo '
+                        <xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>time()</CreateTime>
+                              <MsgType><![CDATA[news]]></MsgType>
+                              <ArticleCount>1</ArticleCount>
+                              <Articles>
+                                <item>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
+                                </item>
+                              </Articles>
+                            </xml>
+                      ';
+
+
+
+            }
+
+
         }
     }
     //根据access_koken获取用户信息 存到Redis中

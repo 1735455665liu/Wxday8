@@ -59,7 +59,6 @@ $(function () {
             {openid:openid,text:text},
             function (res) {
                 if(res.code==1){
-                    history.go(0);
                     layer.msg(res.font,{cion:res.code});
                 }else{
                     layer.msg(res.font,{cion:res.code});

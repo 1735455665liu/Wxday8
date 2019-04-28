@@ -102,7 +102,7 @@ class WeiController extends Controller
      * @param mixed $id
      * @return Show
      */
-    protected function detail($id)
+        protected function detail($id)
     {
         $show = new Show(Wx::findOrFail($id));
 
