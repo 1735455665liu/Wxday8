@@ -174,8 +174,7 @@ class UserController extends Controller
 
             }
             if ($event) {
-                if (isset($data->EventKey)) {
-//                    echo 111;
+                if (isset($event=='SCAN')) {
                     $this->getimgtext($openid, $data, $wx_id);
                 }
             }
