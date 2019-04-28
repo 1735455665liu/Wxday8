@@ -432,7 +432,7 @@ class UserController extends Controller
                       ';
         } else {
             //获取用户信息添加入库
-            $user_info = getUserInfo($openid);
+            $user_info = $this->getUserInfo($openid);
             //用户信息入库
             $data = [
                 'openid' => $user_info['openid'],
