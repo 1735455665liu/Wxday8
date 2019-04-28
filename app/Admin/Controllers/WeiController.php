@@ -3,14 +3,13 @@
 namespace App\Admin\Controllers;
 
 use App\Model\User\Wx;
-use App\User;
 use App\Http\Controllers\Controller;
 use Encore\Admin\Controllers\HasResourceActions;
 use Encore\Admin\Form;
 use Encore\Admin\Grid;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Show;
-
+use GuzzleHttp\Client;
 class WeiController extends Controller
 {
     use HasResourceActions;
@@ -83,16 +82,17 @@ class WeiController extends Controller
         $grid = new Grid(new Wx);
 
         $grid->id('Id');
-        $grid->nickname('名称');
-        $grid->sex('性别');
-        $grid->province('所在省');
-        $grid->country('国家');
-        $grid->city('所在市');
-        $grid->headimgurl('头像')->display(function($img){
-           return  '<img src="'.$img.'">';
-
+        $grid->openid('Openid');
+        $grid->nickname('Nickname');
+        $grid->sex('Sex');
+        $grid->city('City');
+        $grid->province('Province');
+        $grid->country('Country');
+        $grid->headimgurl('Headimgurl');
+        $grid->sub_status('Sub status');
+        $grid->footer(function ($query) {
+            return 'footer';
         });
-
         return $grid;
     }
 
@@ -104,16 +104,17 @@ class WeiController extends Controller
      */
     protected function detail($id)
     {
-        $show = new Show(User::findOrFail($id));
+        $show = new Show(Wx::findOrFail($id));
 
         $show->id('Id');
-        $show->name('Name');
-        $show->email('Email');
-        $show->email_verified_at('Email verified at');
-        $show->password('Password');
-        $show->remember_token('Remember token');
-        $show->created_at('Created at');
-        $show->updated_at('Updated at');
+        $show->openid('Openid');
+        $show->nickname('Nickname');
+        $show->sex('Sex');
+        $show->city('City');
+        $show->province('Province');
+        $show->country('Country');
+        $show->headimgurl('Headimgurl');
+        $show->sub_status('Sub status');
 
         return $show;
     }
@@ -125,14 +126,60 @@ class WeiController extends Controller
      */
     protected function form()
     {
-        $form = new Form(new User);
+        $form = new Form(new Wx);
 
-        $form->text('name', 'Name');
-        $form->email('email', 'Email');
-        $form->datetime('email_verified_at', 'Email verified at')->default(date('Y-m-d H:i:s'));
-        $form->password('password', 'Password');
-        $form->text('remember_token', 'Remember token');
+        $form->text('openid', 'Openid');
+        $form->text('nickname', 'Nickname');
+        $form->text('sex', 'Sex');
+        $form->text('city', 'City');
+        $form->text('province', 'Province');
+        $form->text('country', 'Country');
+        $form->text('headimgurl', 'Headimgurl');
+        $form->switch('sub_status', 'Sub status')->default(1);
 
         return $form;
+    }
+
+    public function send(Content $content){
+
+        //查询用户数据把数据传到前端处理
+        $userInfo=Wx::all()->toArray();
+//        echo '<pre>';print_r($userInfo);echo '<pre>';
+
+
+        return $content
+            ->header('用户')
+            ->description('发送消息')
+            ->body(view('admin.wx.wei',['userInfo'=>$userInfo]));
+    }
+    public function sendadd(){
+        $val=request()->input();
+        //获取文本框的值
+        $content=$val['text'];
+        //处理openid的值,把,号去掉并转换成数组
+        $openid=explode(',',$val['openid']);
+        //获取token
+        $token=Getasstoken();
+        $Cuzzle=new Client();//引用第三方类库
+        $url="https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=".$token;
+        $msg_arr=[
+            'touser'=>$openid,
+            'msgtype'=>'text',
+            'text'=>[
+                'content'=>$content
+            ],
+        ];
+        $arr=json_encode($msg_arr,JSON_UNESCAPED_UNICODE);
+        $response=$Cuzzle->request('post',$url,[
+            'body'=>$arr
+        ]);
+
+            return $response->getBody();
+
+
+
+
+
+
     }
 }

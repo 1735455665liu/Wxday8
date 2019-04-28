@@ -50,6 +50,27 @@ function getsign(){
 
 }
 
+function fial($value){
+    $arr=[
+        'font'=>$value,
+        'code'=>1
+    ];
+    echo json_encode($arr);
+
+
+}
+//错误提示
+function errores($value){
+
+    $arr=[
+        'font'=>$value,
+        'code'=>2
+    ];
+    echo json_encode($arr);exit;
+
+
+}
+
 
 
 

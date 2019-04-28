@@ -10,6 +10,14 @@ Route::group([
     'middleware'    => config('admin.route.middleware'),
 ], function (Router $router) {
     $router->get('/', 'HomeController@index');
-    $router->resource('/users', UserController::class);
-    $router->resource('/wei', WeiController::class);
+
+    $router->get('/file','WxController@file');
+    $router->post('wximg'   ,'WxController@index');
+
+//    $router->resource('/wximg', WxController::class);
+    $router->get('/send','WeiController@send');//消息管理
+    $router->post('/sendadd','WeiController@sendadd');//消息管理
+    $router->resource('/users', UserController::class);//用户管理
+    $router->resource('/maclist',macController::class);//素材管理
+
 });
