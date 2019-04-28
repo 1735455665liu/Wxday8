@@ -9,6 +9,8 @@
 </head>
 <body>
 <script src="/js/jquery/jquery-1.12.4.min.js"></script>
+<script src="/js/layui/layui.js"></script>
+
 <div class="btn-group" data-toggle="buttons">
 
 
@@ -36,6 +38,8 @@
 </html>
 <script>
 $(function () {
+    layui.use('layer',function(){
+        var layer =layui.layer;
     $('#submit').click(function () {
         var check=$('.check');//获取复选框
         var openid='';
@@ -54,11 +58,17 @@ $(function () {
             '/admin/sendadd',
             {openid:openid,text:text},
             function (res) {
-                console.log(res);
-            }
+                if(res.code==1){
+                    history.go(0);
+                    layer.msg(res.font,{cion:res.code});
+                }else{
+                    layer.msg(res.font,{cion:res.code});
+                }
+            },'json'
 
 
     )
+        })
     })
 })
 

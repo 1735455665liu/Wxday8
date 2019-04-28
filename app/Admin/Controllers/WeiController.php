@@ -170,6 +170,13 @@ class WeiController extends Controller
         $response=$Cuzzle->request('post',$url,[
             'body'=>$arr
         ]);
-            return $response->getBody();
+            $res=$response->getBody();
+            $arr=json_decode($res,true);
+            if($arr['errcode']>0){
+                    fial('发送成功');
+            }else{
+                   errores('发送失败');
+            }
+//            var_dump($arr);die;
     }
 }
