@@ -410,7 +410,7 @@ class UserController extends Controller
     public function getimgtext($openid, $data, $wx_id)
     {
         //检查用户是否已存在
-        $userInfo = tmp_wx_users    ::where(['openid' => $openid])->first();
+        $userInfo =tmp_wx_users::where(['openid' => $openid])->first();
         if ($userInfo) {         //用户已存在
             $title = "欢迎回来";//标题
             $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
@@ -435,7 +435,7 @@ class UserController extends Controller
                       ';
         } else {
             //获取用户信息添加入库
-            $user_info = getWxUserInfo($openid);
+            $user_info = getUserInfo($openid);
             //用户信息入库
             $data = [
                 'openid' => $user_info['openid'],
@@ -476,7 +476,7 @@ class UserController extends Controller
     }
 
 
-
+//扫码跳转
     public function getgoods(){
         $goodsInfo=p_detail::all()->toArray();
         $server = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
