@@ -171,32 +171,6 @@ class UserController extends Controller
 
             }
             if($event=='SCAN'){
-                //获取token
-                $token=$this->getAccessToken();
-                $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$token.'';
-                $arr=[
-                  "expire_seconds"=>604800,
-                    "action_name"=>"QR_SCENE",
-                    "action_info"=>"scene",
-                        "scene_id"=>999
-                ];
-                $json=json_encode($arr,JSON_UNESCAPED_UNICODE);
-                $clinet=new Client();
-                $response=$clinet->request('post',$url,[
-                    'body'=>$json
-                ]);
-                $ticket=$response->getBody();
-                $ticket_json=json_decode($ticket,true);
-                $ticket_arr=$ticket_json['ticket'];
-                $url_ticket_arr='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$ticket_arr.'';
-                $addInfo=[
-                    'openid'=>$openid,
-                    'ticket'=>$ticket_json['ticket'],
-                    'expire_seconds'=>$ticket_json['expire_seconds'],
-                    'createtime'=>time()
-                ];
-                $add=tmp_wx_users::insertGetId($addInfo);
-
                 $title = "劲爆新闻烨氏集团即将-";//标题
                 $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
                 $url = "https://1809liuziye.comcto.com";
@@ -218,9 +192,7 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
-
-
-
+                $this->getimgtext($openid);
             }
 
 
@@ -435,6 +407,35 @@ class UserController extends Controller
 
 
 
+    }
+
+    //扫码推送图文消息
+    public function getimgtext($openid){
+        //获取token
+        $token=$this->getAccessToken();
+        $url='https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token='.$token.'';
+        $arr=[
+            "expire_seconds"=>604800,
+            "action_name"=>"QR_SCENE",
+            "action_info"=>"scene",
+            "scene_id"=>999
+        ];
+        $json=json_encode($arr,JSON_UNESCAPED_UNICODE);
+        $clinet=new Client();
+        $response=$clinet->request('post',$url,[
+            'body'=>$json
+        ]);
+        $ticket=$response->getBody();
+        $ticket_json=json_decode($ticket,true);
+        $ticket_arr=$ticket_json['ticket'];
+        $url_ticket_arr='https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='.$ticket_arr.'';
+        $addInfo=[
+            'openid'=>$openid,
+            'ticket'=>$ticket_json['ticket'],
+            'expire_seconds'=>$ticket_json['expire_seconds'],
+            'createtime'=>time()
+        ];
+        $add=tmp_wx_users::insertGetId($addInfo);
     }
 
 }
