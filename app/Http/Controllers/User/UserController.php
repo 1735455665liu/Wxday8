@@ -171,12 +171,8 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
-            if(isset($event)){
-                //欢迎新用户
-                if(isset($data->EventKey)){
-                    $this->getimgtext($openid,$data,$wx_id);
-                }
-
+            if($event=='SCAN'){
+                $this->getimgtext($openid,$data,$wx_id);
             }
         }
     }
@@ -412,7 +408,7 @@ class UserController extends Controller
         $ticket_json = json_decode($ticket, true);
         $ticket_arr = $ticket_json['ticket'];
         $url_ticket_arr = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . $ticket_arr . '';
-        $userInfo=p_wx_users::where(['openid'=>$openid])->first();
+        $userInfo=Wx::where(['openid'=>$data->FromUserName])->first();
         if($userInfo){  //有 就提示
             $title = "欢迎回来";//标题
             $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
