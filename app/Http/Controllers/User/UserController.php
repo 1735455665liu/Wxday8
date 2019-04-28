@@ -177,10 +177,6 @@ class UserController extends Controller
                 if (isset($data->EventKey)) {
 //                    echo 111;
                     $this->getimgtext($openid, $data, $wx_id);
-                } else if ($event == 'subscribe') {
-                    echo 111;
-                    $this->subscribe($data);       //扫码关注
-
                 }
             }
         }
@@ -454,7 +450,7 @@ class UserController extends Controller
             ];
             $id = Wx::insertGetId($data);
             if ($id) {  //有 就提示
-                $title = "烨氏集团";//标题
+                $title = "欢迎新用户";//标题
                 $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
                 $url = "https://1809liuziye.comcto.com";
                 $picurl = "https://1809liuziye.comcto.com/img/123.jpg";
@@ -479,13 +475,7 @@ class UserController extends Controller
         }
     }
 
-    //扫码关注推送图文
-    public function subscribe($data)
-    {
-        if (isset($data->EventKey)) {
-            echo 1111;
-        }
-    }
+
 
     public function getgoods(){
         $goodsInfo=p_detail::all()->toArray();
