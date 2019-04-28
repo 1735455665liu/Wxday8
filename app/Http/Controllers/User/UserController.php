@@ -173,11 +173,9 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
-            if ($event) {
-                if (isset($event=='SCAN')) {
+                if ($event=='SCAN') {
                     $this->getimgtext($openid, $data, $wx_id);
                 }
-            }
         }
     }
 
