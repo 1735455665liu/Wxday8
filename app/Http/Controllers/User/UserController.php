@@ -19,7 +19,8 @@ use App\Model\tmp_wx_users;
 class UserController extends Controller
 {
 
-    public function valid(){
+    public function valid()
+    {
         echo $_GET['echostr'];
     }
     // 处理首次接入GET请求
@@ -171,245 +172,247 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
-            if($event=='SCAN'){
-                $this->getimgtext($openid,$data,$wx_id);
+            if ($event) {
+                if (isset($data->EventKey)) {
+                    $this->getimgtext($openid, $data, $wx_id);
+                } else if ($event == 'subscribe') {
+                    $this->subscribe($data);       //扫码关注
+
+                }
             }
         }
     }
-    //根据access_koken获取用户信息 存到Redis中
-    public function getAccessToken(){
-        //是否有缓存
-        $key="wx_accsstoken";
-        $token=Redis::get($key);
-        if($token){
 
-        }else{
+    //根据access_koken获取用户信息 存到Redis中
+    public function getAccessToken()
+    {
+        //是否有缓存
+        $key = "wx_accsstoken";
+        $token = Redis::get($key);
+        if ($token) {
+
+        } else {
             //通过Taccess_token获取信息
-            $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid='.env('WX_APP_ID').'&secret='.env('WX_APP_SECRET');
-            $response=file_get_contents($url);
-            $arr=json_decode($response,true);
+            $url = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' . env('WX_APP_ID') . '&secret=' . env('WX_APP_SECRET');
+            $response = file_get_contents($url);
+            $arr = json_decode($response, true);
             //设置
-            Redis::set($key,$arr['access_token']);
-            Redis::expire($key,7200);  //缓存2小时
-            $token=$arr['access_token'];
+            Redis::set($key, $arr['access_token']);
+            Redis::expire($key, 7200);  //缓存2小时
+            $token = $arr['access_token'];
         }
         return $token;
 
     }
+
     //获取用户信息
-    public function getUserInfo($openid){
-        $url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token='.$this->getAccessToken().'&openid='.$openid.'&lang=zh_CN';
-        $date=file_get_contents($url);
-        $u=json_decode($date,true);
+    public function getUserInfo($openid)
+    {
+        $url = 'https://api.weixin.qq.com/cgi-bin/user/info?access_token=' . $this->getAccessToken() . '&openid=' . $openid . '&lang=zh_CN';
+        $date = file_get_contents($url);
+        $u = json_decode($date, true);
         return $u;
     }
-    public function test(){
-        $access_token=$this->getAccessToken();
-        echo'token :'.$access_token;echo'<br>';
-    }
-    //创建公众号菜单
-    public function createMenu(){
-        //1、调用公众号菜单的接口
-        $url=' https://api.weixin.qq.com/cgi-bin/menu/create?access_token='.$this->getAccessToken();
-        //接口数据
-        $p_arr=[
 
-            "button"=>[
+    public function test()
+    {
+        $access_token = $this->getAccessToken();
+        echo 'token :' . $access_token;
+        echo '<br>';
+    }
+
+    //创建公众号菜单
+    public function createMenu()
+    {
+        //1、调用公众号菜单的接口
+        $url = ' https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $this->getAccessToken();
+        //接口数据
+        $p_arr = [
+
+            "button" => [
                 [
-                    "type"=>"click",
-                    "name"=>"烨氏了解一下",
-                    "key"=>"V1001_TODAY_MUSIC"
+                    "type" => "click",
+                    "name" => "烨氏了解一下",
+                    "key" => "V1001_TODAY_MUSIC"
                 ],
-                "name"=>"本人",
-                "sub_button"=>[
-                    "type"=>"view",
-                    "name"=>"缺点",
-                    "url"=>"http://www.soso.com/"
-                ],
-                [
-                    "type"=>"miniprogram",
-                    "name"=>"颜值高",
-                    "url"=>"http://mp.weixin.qq.com",
-                    "appid"=>"wx286b93c14bbf93aa",
-                    "pagepath"=>"pages/lunar/index"
+                "name" => "本人",
+                "sub_button" => [
+                    "type" => "view",
+                    "name" => "缺点",
+                    "url" => "http://www.soso.com/"
                 ],
                 [
-                    "type"=>"click",
-                    "name"=>"还是高",
-                    "key"=>"V1001_GOOD"
+                    "type" => "miniprogram",
+                    "name" => "颜值高",
+                    "url" => "http://mp.weixin.qq.com",
+                    "appid" => "wx286b93c14bbf93aa",
+                    "pagepath" => "pages/lunar/index"
+                ],
+                [
+                    "type" => "click",
+                    "name" => "还是高",
+                    "key" => "V1001_GOOD"
                 ]
             ]
         ];
         //处理中文编码
-        $json_str=json_encode($p_arr,JSON_UNESCAPED_UNICODE);
+        $json_str = json_encode($p_arr, JSON_UNESCAPED_UNICODE);
         //发送请求
-        $cli= new Client();
-        $response=$cli->request('POST',$url,[
+        $cli = new Client();
+        $response = $cli->request('POST', $url, [
             'body' => $json_str
         ]);
         //处理响应
-        $res_str=$response->getBody();
-        $arr =json_decode($res_str,true);
+        $res_str = $response->getBody();
+        $arr = json_decode($res_str, true);
         //判断错误信息
-        if($arr['errcode']>0){
+        if ($arr['errcode'] > 0) {
             echo "创建菜单失败";
-        }else{
+        } else {
             echo "创建菜单成功";
         }
 
 
-
-
-
     }
+
     //图片素材
-    public function WxImage($media_id){
+    public function WxImage($media_id)
+    {
         //调用素材接口
-        $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
+        $url = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token=' . $this->getAccessToken() . '&media_id=' . $media_id;
         //获取文件名
-        $Client=new Client();
+        $Client = new Client();
         $response = $Client->get($url);
         $file_info = $response->getHeader('Content-disposition'); //通过第三方类库获取文件的详细信息
-        $file_name = substr(rtrim($file_info[0],'"'),-20); //把图片多余的符号去除并截取
-        $file_url='/wx/image/'.$file_name; //图片的路径+图片
+        $file_name = substr(rtrim($file_info[0], '"'), -20); //把图片多余的符号去除并截取
+        $file_url = '/wx/image/' . $file_name; //图片的路径+图片
         //保存图片
-        $imgInfo=Storage::disk('local')->put($file_url,$response->getBody());
+        $imgInfo = Storage::disk('local')->put($file_url, $response->getBody());
         return $file_name;  //把路径返回回去
 
     }
+
     //语音素材
-    public function Wxyy($media_id){
+    public function Wxyy($media_id)
+    {
         //调用接口
-        $url='https://api.weixin.qq.com/cgi-bin/media/get?access_token='.$this->getAccessToken().'&media_id='.$media_id;
-        $client=new Client();//引用第三方类库
-        $response=$client->get($url); //通过第三类库获取
-        $fileinfo=$response->getHeader('Content-disposition');
-        $file_name=rtrim(substr($fileinfo[0],-20),'"');
-        $wx_image_path = 'wx/images/'.$file_name;
+        $url = 'https://api.weixin.qq.com/cgi-bin/media/get?access_token=' . $this->getAccessToken() . '&media_id=' . $media_id;
+        $client = new Client();//引用第三方类库
+        $response = $client->get($url); //通过第三类库获取
+        $fileinfo = $response->getHeader('Content-disposition');
+        $file_name = rtrim(substr($fileinfo[0], -20), '"');
+        $wx_image_path = 'wx/images/' . $file_name;
         //保存语音
-        $wxy=Storage::disk('local')->put($wx_image_path,$response->getBody());
+        $wxy = Storage::disk('local')->put($wx_image_path, $response->getBody());
         return $file_name;
     }
+
     //群发信息
-    public function SendMsg($openid,$content){
-        $msg_arr=[
-            'touser'=>$openid,
-            'msgtype'=>'text',
-            'text'=>[
-                'content'=>$content
+    public function SendMsg($openid, $content)
+    {
+        $msg_arr = [
+            'touser' => $openid,
+            'msgtype' => 'text',
+            'text' => [
+                'content' => $content
             ],
         ];
-        $json_xml=json_encode($msg_arr,JSON_UNESCAPED_UNICODE); //转化为json串
+        $json_xml = json_encode($msg_arr, JSON_UNESCAPED_UNICODE); //转化为json串
         //使用微信群发接口 使用accessToken
-        $url="https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=".$this->getAccessToken();
+        $url = "https://api.weixin.qq.com/cgi-bin/message/mass/send?access_token=" . $this->getAccessToken();
         //使用第三方类库
-        $Client= new Client();
+        $Client = new Client();
         //把数据通过第三方库传过去
-        $response=$Client->request('post',$url,[
-            'body'=>$json_xml
+        $response = $Client->request('post', $url, [
+            'body' => $json_xml
         ]);
         return $response->getBody();
     }
-    public function send(){
+
+    public function send()
+    {
         //查询状态为登陆的
-        $seInfo=Wx::where(['sub_status'=>1])->get()->toArray();
+        $seInfo = Wx::where(['sub_status' => 1])->get()->toArray();
         //使用array_cloumn根据openid把数据返回某一列
-        $openid=array_column($seInfo,'openid');
+        $openid = array_column($seInfo, 'openid');
         //要发送的信息
-        $msg="欢迎加入烨氏集团";
+        $msg = "欢迎加入烨氏集团";
         //调用sendMsg把信息返回过去
-        $response=$this->SendMsg($openid,$msg);
+        $response = $this->SendMsg($openid, $msg);
         echo $response;
     }
+
 //    签名jssdk
-    public function fxjssdk(){
-        $ticket=getsign();   //jsdk签名
-        $timestamp=time();  //当前时间
-        $nonceStr=Str::random(10);//随机字符串
-        $current_url=$_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    public function fxjssdk()
+    {
+        $ticket = getsign();   //jsdk签名
+        $timestamp = time();  //当前时间
+        $nonceStr = Str::random(10);//随机字符串
+        $current_url = $_SERVER['REQUEST_SCHEME'] . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
         //计算拼接签名
         $string1 = "jsapi_ticket=$ticket&noncestr=$nonceStr&timestamp=$timestamp&url=$current_url";
         $sign = sha1($string1);
-        $js_jssdk=[
-            "appId"=>env('WX_APP_ID'),//公总号id
-            "timestamp"=>$timestamp,//生成签名时间戳
-            "nonceStr"=>$nonceStr,//生成签名的随机字符串
-            "signature"=>$sign,//签名
+        $js_jssdk = [
+            "appId" => env('WX_APP_ID'),//公总号id
+            "timestamp" => $timestamp,//生成签名时间戳
+            "nonceStr" => $nonceStr,//生成签名的随机字符串
+            "signature" => $sign,//签名
         ];
-        $data=[
-            'js_jssdk'=>$js_jssdk
+        $data = [
+            'js_jssdk' => $js_jssdk
         ];
-        return view('wx.user',$data);
+        return view('wx.user', $data);
     }
+
     //微信回调
-    public function repson(){
+    public function repson()
+    {
 //        echo '<pre>';print_r($_GET);echo '<pre>';
         //获取code
-        $code=$_GET['code'];
-        $url='https://api.weixin.qq.com/sns/oauth2/access_token?appid='.env('WX_APP_ID').'&secret='.env('WX_APP_SECRET').'&code='.$code.'&grant_type=authorization_code';
-        $response=json_decode(file_get_contents($url),true);
+        $code = $_GET['code'];
+        $url = 'https://api.weixin.qq.com/sns/oauth2/access_token?appid=' . env('WX_APP_ID') . '&secret=' . env('WX_APP_SECRET') . '&code=' . $code . '&grant_type=authorization_code';
+        $response = json_decode(file_get_contents($url), true);
 //        echo '<pre>';print_r($response);echo '<pre>';
 
 
         //获取用户信息
-        $access_token=$response['access_token'];
-        $openid=$response['openid'];
-        $url='https://api.weixin.qq.com/sns/userinfo?access_token='.$access_token.'&openid='.$openid.'&lang=zh_CN';
-        $user=json_decode(file_get_contents($url),true);
+        $access_token = $response['access_token'];
+        $openid = $response['openid'];
+        $url = 'https://api.weixin.qq.com/sns/userinfo?access_token=' . $access_token . '&openid=' . $openid . '&lang=zh_CN';
+        $user = json_decode(file_get_contents($url), true);
 //        echo '<pre>';print_r($user);echo '<pre>';
 
-        $userInfo=Wx::where(['openid'=>$user['openid']])->first();
-        if($userInfo){
-            if($user['openid']==$userInfo->openid){
+        $userInfo = Wx::where(['openid' => $user['openid']])->first();
+        if ($userInfo) {
+            if ($user['openid'] == $userInfo->openid) {
                 echo '欢迎大哥回来';
             }
-        }else{
+        } else {
             //添加入库进行判断
-            $add=[
-                'openid'=>$user['openid'],
-                'nickname'=>$user['nickname'],
-                'sex'=>$user['sex'],
-                'city'=>$user['city'],
-                'city'=>$user['city'],
-                'city'=>$user['city'],
-                'province'=>$user['province'],
-                'country'=>$user['country'],
-                'headimgurl'=>$user['headimgurl']
+            $add = [
+                'openid' => $user['openid'],
+                'nickname' => $user['nickname'],
+                'sex' => $user['sex'],
+                'city' => $user['city'],
+                'city' => $user['city'],
+                'city' => $user['city'],
+                'province' => $user['province'],
+                'country' => $user['country'],
+                'headimgurl' => $user['headimgurl']
             ];
-            $Wxusers=Wx::insertGetId($add);
+            $Wxusers = Wx::insertGetId($add);
             echo '欢迎关注';
         }
-
-
-
-
 
 
     }
 
     //扫码推送图文消息
-    public function getimgtext($openid,$data,$wx_id)
+    public function getimgtext($openid, $data, $wx_id)
     {
-        //获取token
-        $token = $this->getAccessToken();
-        $url = 'https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=' . $token . '';
-        $arr = [
-            "expire_seconds" => 604800,
-            "action_name" => "QR_SCENE",
-            "action_info" => "scene",
-            "scene_id" => 999
-        ];
-        $json = json_encode($arr, JSON_UNESCAPED_UNICODE);
-        $clinet = new Client();
-        $response = $clinet->request('post', $url, [
-            'body' => $json
-        ]);
-        $ticket = $response->getBody();
-        $ticket_json = json_decode($ticket, true);
-        $ticket_arr = $ticket_json['ticket'];
-        $url_ticket_arr = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=' . $ticket_arr . '';
-        $userInfo=Wx::where(['openid'=>$data->FromUserName])->first();
-        if($userInfo){  //有 就提示
+        //检查用户是否已存在
+        $userInfo = Wx::where(['openid' => $openid])->first();
+        if ($userInfo) {         //用户已存在
             $title = "欢迎回来";//标题
             $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
             $url = "https://1809liuziye.comcto.com";
@@ -431,22 +434,24 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
-        }else{          //没有就入库
-            $user=$this->getUserInfo($openid);
-            $addInfo = [
-                'openid'    => $user['openid'],
-                'add_time'    => time(),
-                'nickname'    => $user['nickname'],
-                'sex'    => $user['sex'],
-                'city'    => $user['city'],
-                'province'    => $user['province'],
-                'headimgurl'    => $user['headimgurl'],
-                'subscribe_time'    => $user['subscribe_time'],
-                'scence_id'    => $data->EventKey,
+        } else {
+            //获取用户信息添加入库
+            $user_info = getWxUserInfo($openid);
+            //用户信息入库
+            $data = [
+                'openid' => $user_info['openid'],
+                'add_time' => time(),
+                'nickname' => $user_info['nickname'],
+                'sex' => $user_info['sex'],
+                'city' => $user_info['city'],
+                'province' => $user_info['province'],
+                'headimgurl' => $user_info['headimgurl'],
+                'subscribe_time' => $user_info['subscribe_time'],
+                'scence_id' => $data->EventKey,
             ];
-            $add = p_wx_users::insertGetId($addInfo);
-            if($add){
-                $title = "欢迎新用户";//标题
+            $id = Wx::insertGetId($data);
+            if ($id) {  //有 就提示
+                $title = "烨氏集团";//标题
                 $textarea = "集团介绍 中国核工业集团有限公司是经国务院批准组建、中央直接管理的国有重要骨干企业,由200多家企事业单位和科研院所组成。国家核科技工业的主体,国家核能发展与...";
                 $url = "https://1809liuziye.comcto.com";
                 $picurl = "https://1809liuziye.comcto.com/img/123.jpg";
@@ -466,18 +471,16 @@ class UserController extends Controller
                                 </item>
                               </Articles>
                             </xml>
-                      ';
-
+                   ';
             }
         }
-
-
-
-
     }
 
-    public function subscribe($data){
-        var_dump($data);
+    //扫码关注推送图文
+    public function subscribe($data)
+    {
+        if (isset($data->EventKey)) {
+            echo 1111;
+        }
     }
-
 }
