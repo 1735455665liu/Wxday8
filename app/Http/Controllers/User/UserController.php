@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Model\jssdk;
 use App\Model\tmp_wx_users;
+use App\Model\p_detail;
 class UserController extends Controller
 {
 
@@ -174,8 +175,10 @@ class UserController extends Controller
             }
             if ($event) {
                 if (isset($data->EventKey)) {
+//                    echo 111;
                     $this->getimgtext($openid, $data, $wx_id);
                 } else if ($event == 'subscribe') {
+                    echo 111;
                     $this->subscribe($data);       //扫码关注
 
                 }
@@ -482,5 +485,11 @@ class UserController extends Controller
         if (isset($data->EventKey)) {
             echo 1111;
         }
+    }
+
+    public function getgoods(){
+        $goodsInfo=p_detail::all()->toArray();
+        $server = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
+        return view('wx.wxlist',['goodsInfo'=>$goodsInfo],['server'=>$server]);
     }
 }
