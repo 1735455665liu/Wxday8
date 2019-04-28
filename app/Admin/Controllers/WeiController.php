@@ -144,9 +144,6 @@ class WeiController extends Controller
 
         //查询用户数据把数据传到前端处理
         $userInfo=Wx::all()->toArray();
-//        echo '<pre>';print_r($userInfo);echo '<pre>';
-
-
         return $content
             ->header('用户')
             ->description('发送消息')
@@ -173,13 +170,6 @@ class WeiController extends Controller
         $response=$Cuzzle->request('post',$url,[
             'body'=>$arr
         ]);
-
             return $response->getBody();
-
-
-
-
-
-
     }
 }

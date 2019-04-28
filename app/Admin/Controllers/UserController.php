@@ -13,7 +13,6 @@ use Encore\Admin\Show;
 class UserController extends Controller
 {
     use HasResourceActions;
-
     /**
      * Index interface.
      *

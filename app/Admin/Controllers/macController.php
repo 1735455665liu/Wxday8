@@ -13,7 +13,6 @@ use Encore\Admin\Show;
 class macController extends Controller
 {
     use HasResourceActions;
-
     /**
      * Index interface.
      *

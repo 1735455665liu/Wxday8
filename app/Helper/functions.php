@@ -26,7 +26,6 @@ function Getasstoken(){
 
 
 }
-
 //计算签名
 function getsign(){
 
@@ -70,7 +69,6 @@ function errores($value){
 
 
 }
-
 
 
 
