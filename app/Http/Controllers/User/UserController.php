@@ -174,6 +174,7 @@ class UserController extends Controller
 
             }
                 if ($event=='SCAN') {
+//                    echo 111;
                     $this->getimgtext($openid, $data, $wx_id);
                 }
         }
@@ -441,8 +442,8 @@ class UserController extends Controller
                 'sex' => $user_info['sex'],
                 'city' => $user_info['city'],
                 'province' => $user_info['province'],
+                'country' => $user_info['country'],
                 'headimgurl' => $user_info['headimgurl'],
-                'subscribe_time' => $user_info['subscribe_time'],
                 'scence_id' => $data->EventKey,
             ];
             $id = tmp_wx_users::insertGetId($data);
