@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\User;
-
+use App\Model\p_goods;
 use App\Model\p_wx_users;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -19,12 +19,11 @@ use App\Model\tmp_wx_users;
 use App\Model\p_detail;
 class UserController extends Controller
 {
-
+    // 处理首次接入GET请求
     public function valid()
     {
         echo $_GET['echostr'];
     }
-    // 处理首次接入GET请求
     //接收微信事件推送 POST
     public function wxEvent()
     {
@@ -42,6 +41,8 @@ class UserController extends Controller
 //        echo 'Event: '. $data->Event;echo '</br>';                  // 事件类型
 //        echo 'EventKey: '. $data->EventKey;echo '</br>';
 //         echo 'EventKey: '. $data->MediaId;echo '</br>';
+//          echo 'Content: '. $data->Content;echo '</br>';
+
 //die;
         $wx_id = $data->ToUserName;             // 公众号ID
         $openid = $data->FromUserName;         //用户OpenID
@@ -123,6 +124,64 @@ class UserController extends Controller
                             </xml>
                       ';
                 }
+                if(isset($data->Content)){
+                    $content=$data->Content;
+                    $goodsInfo=p_goods::all()->toArray();
+                    if($goodsInfo){//有数据查询并展示出来
+                        $goods_name=p_goods::where('goods_name','like','%'.$content.'%')->first();
+                        if($goods_name){
+                            $title = $goods_name['goods_name'];//标题
+                            $textarea =$goods_name['goods_list'];
+                            $url = "https://1809liuziye.comcto.com";
+                            $picurl = 'https://1809liuziye.comcto.com'.$goods_name['goods_url'].'';
+                            echo '
+                        <xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>time()</CreateTime>
+                              <MsgType><![CDATA[news]]></MsgType>
+                              <ArticleCount>1</ArticleCount>
+                              <Articles>
+                                <item>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
+                                </item>
+                              </Articles>
+                            </xml>
+                      ';
+                        }else{
+                            //没有则随机展示一条
+                        $is_goods=p_goods::where(['is_goods'=>1])->inRandomOrder()->first();
+                            $title = $goods_name['goods_name'];//标题
+                            $textarea =$goods_name['goods_list'];
+                            $url = "https://1809liuziye.comcto.com";
+                            $picurl = 'https://1809liuziye.comcto.com'.$goods_name['goods_url'].'';
+
+                        echo '
+                        <xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>time()</CreateTime>
+                              <MsgType><![CDATA[news]]></MsgType>
+                              <ArticleCount>1</ArticleCount>
+                              <Articles>
+                                <item>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
+                                </item>
+                              </Articles>
+                            </xml>
+                      ';
+                        }
+                    }
+                }
+
+
+
             } else if ($MsgType == 'voice') {    //语音入库
                 $file_name = $this->Wxyy($media_id); //语音的信息
                 $b_arr = [
@@ -179,7 +238,6 @@ class UserController extends Controller
                 }
         }
     }
-
     //根据access_koken获取用户信息 存到Redis中
     public function getAccessToken()
     {
@@ -201,7 +259,6 @@ class UserController extends Controller
         return $token;
 
     }
-
     //获取用户信息
     public function getUserInfo($openid)
     {
@@ -210,14 +267,13 @@ class UserController extends Controller
         $u = json_decode($date, true);
         return $u;
     }
-
+    //测试获取Token
     public function test()
     {
         $access_token = $this->getAccessToken();
         echo 'token :' . $access_token;
         echo '<br>';
     }
-
     //创建公众号菜单
     public function createMenu()
     {
@@ -271,7 +327,6 @@ class UserController extends Controller
 
 
     }
-
     //图片素材
     public function WxImage($media_id)
     {
@@ -288,7 +343,6 @@ class UserController extends Controller
         return $file_name;  //把路径返回回去
 
     }
-
     //语音素材
     public function Wxyy($media_id)
     {
@@ -303,7 +357,6 @@ class UserController extends Controller
         $wxy = Storage::disk('local')->put($wx_image_path, $response->getBody());
         return $file_name;
     }
-
     //群发信息
     public function SendMsg($openid, $content)
     {
@@ -325,7 +378,7 @@ class UserController extends Controller
         ]);
         return $response->getBody();
     }
-
+    //群发消息
     public function send()
     {
         //查询状态为登陆的
@@ -338,7 +391,6 @@ class UserController extends Controller
         $response = $this->SendMsg($openid, $msg);
         echo $response;
     }
-
 //    签名jssdk
     public function fxjssdk()
     {
@@ -360,7 +412,6 @@ class UserController extends Controller
         ];
         return view('wx.user', $data);
     }
-
     //微信回调
     public function repson()
     {
@@ -403,7 +454,6 @@ class UserController extends Controller
 
 
     }
-
     //扫码推送图文消息
     public function getimgtext($openid, $data, $wx_id)
     {
@@ -472,12 +522,13 @@ class UserController extends Controller
             }
         }
     }
-
-
 //扫码跳转
     public function getgoods(){
         $goodsInfo=p_detail::all()->toArray();
         $server = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
         return view('wx.wxlist',['goodsInfo'=>$goodsInfo],['server'=>$server]);
     }
+
+
+
 }
