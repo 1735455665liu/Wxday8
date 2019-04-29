@@ -155,7 +155,7 @@ class UserController extends Controller
                             //没有则随机展示一条
                             $total = p_goods::count() - 1;
                             $skip = mt_rand(0, $total);
-                            $item = p_goods::select('goods_name', 'goods_id')->skip($skip)->take(1)->first();
+                            $item = p_goods::select('goods_name', 'goods_id','goods_list','goods_url')->skip($skip)->take(1)->first();
                             $title = $item['goods_name'];//标题
                             $textarea =$item['goods_list'];
                             $url = "https://1809liuziye.comcto.com";
