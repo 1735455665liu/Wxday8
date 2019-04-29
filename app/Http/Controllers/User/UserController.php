@@ -153,12 +153,13 @@ class UserController extends Controller
                       ';
                         }else{
                             //没有则随机展示一条
-
-                         $is_goods=p_goods::all()->random(1);;
-                            $title = $is_goods['goods_name'];//标题
-                            $textarea =$is_goods['goods_list'];
+                            $total = p_goods::count() - 1;
+                            $skip = mt_rand(0, $total);
+                            $item = p_goods::select('goods_name', 'goods_id')->skip($skip)->take(1)->first();
+                            $title = $item['goods_name'];//标题
+                            $textarea =$item['goods_list'];
                             $url = "https://1809liuziye.comcto.com";
-                            $picurl = 'https://1809liuziye.comcto.com'.$is_goods['goods_url'].'';
+                            $picurl = 'https://1809liuziye.comcto.com'.$item['goods_url'].'';
 
                         echo '
                         <xml>
