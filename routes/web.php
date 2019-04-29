@@ -47,3 +47,14 @@ Route::get('/wxweb/u','User\UserController@repson');  //微信网页授权回调
 Route::get('/getgoods','User\UserController@getgoods');  //扫码跳转
 
 
+//文件上传
+Route::get('/myfile','GoodsController@myfilezZ');  //扫码跳转
+
+
+
+
+Route::post('/msgMenu','User\UserController@msgMenu');  //自定义菜单
+
+
+
+

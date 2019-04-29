@@ -276,59 +276,6 @@ class UserController extends Controller
         echo 'token :' . $access_token;
         echo '<br>';
     }
-    //创建公众号菜单
-    public function createMenu()
-    {
-        //1、调用公众号菜单的接口
-        $url = ' https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $this->getAccessToken();
-        //接口数据
-        $p_arr = [
-
-            "button" => [
-                [
-                    "type" => "click",
-                    "name" => "烨氏了解一下",
-                    "key" => "V1001_TODAY_MUSIC"
-                ],
-                "name" => "本人",
-                "sub_button" => [
-                    "type" => "view",
-                    "name" => "缺点",
-                    "url" => "http://www.soso.com/"
-                ],
-                [
-                    "type" => "miniprogram",
-                    "name" => "颜值高",
-                    "url" => "http://mp.weixin.qq.com",
-                    "appid" => "wx286b93c14bbf93aa",
-                    "pagepath" => "pages/lunar/index"
-                ],
-                [
-                    "type" => "click",
-                    "name" => "还是高",
-                    "key" => "V1001_GOOD"
-                ]
-            ]
-        ];
-        //处理中文编码
-        $json_str = json_encode($p_arr, JSON_UNESCAPED_UNICODE);
-        //发送请求
-        $cli = new Client();
-        $response = $cli->request('POST', $url, [
-            'body' => $json_str
-        ]);
-        //处理响应
-        $res_str = $response->getBody();
-        $arr = json_decode($res_str, true);
-        //判断错误信息
-        if ($arr['errcode'] > 0) {
-            echo "创建菜单失败";
-        } else {
-            echo "创建菜单成功";
-        }
-
-
-    }
     //图片素材
     public function WxImage($media_id)
     {
@@ -531,6 +478,36 @@ class UserController extends Controller
         return view('wx.wxlist',['goodsInfo'=>$goodsInfo],['server'=>$server]);
     }
 
-
-
+    //创建公总号菜单接口
+    public function msgMenu(){
+        //1、调用公众号菜单的接口
+        $url = ' https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $this->getAccessToken();
+        //接口数据
+        $p_arr = [
+            "button" => [
+                [
+                    "type" => "view",
+                    "name" => "今日福利",
+                    "url" => "https://1809liuziye.comcto.com/wxweb/u"
+                ],
+            ]
+        ];
+        //处理中文编码
+        $json_str = json_encode($p_arr, JSON_UNESCAPED_UNICODE);
+        //发送请求
+        $cli = new Client();
+        $response = $cli->request('POST', $url, [
+            'body' => $json_str
+        ]);
+        //处理响应
+        $res_str = $response->getBody();
+        echo $res_str;
+//        $arr = json_decode($res_str, true);
+//        //判断错误信息
+//        if ($arr['errcode'] > 0) {
+//            echo "创建菜单失败";
+//        } else {
+//            echo "创建菜单成功";
+//        }
+    }
 }

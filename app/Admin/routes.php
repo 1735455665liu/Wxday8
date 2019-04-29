@@ -17,5 +17,7 @@ Route::group([
     $router->post('/sendadd','WeiController@sendadd');//消息管理
     $router->resource('/users', UserController::class);//用户管理
     $router->resource('/maclist',macController::class);//素材管理
+    $router->resource('/goods',GoodsController::class);//商品管理
+
 
 });
