@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\User;
+use App\Model\p_goodsname;
 use App\Model\p_goods;
 use App\Model\p_wx_users;
 use Illuminate\Http\Request;
@@ -49,6 +50,12 @@ class UserController extends Controller
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
         $media_id = $data->MediaId;               //媒体文件id
+        $content=$data->Content;
+
+//        $p_goodsname=p_goodsname::
+
+
+
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
@@ -124,17 +131,20 @@ class UserController extends Controller
                             </xml>
                       ';
                 }
-                if(isset($data->Content)){
-                    $content=$data->Content;
-                    $goodsInfo=p_goods::all()->toArray();
-                    if($goodsInfo){//有数据查询并展示出来
-                        $goods_name=p_goods::where('goods_name','like','%'.$content.'%')->first();
-                        if($goods_name){
-                            $title = $goods_name['goods_name'];//标题
-                            $textarea =$goods_name['goods_list'];
-                            $url = "https://1809liuziye.comcto.com";
-                            $picurl = 'https://1809liuziye.comcto.com'.$goods_name['goods_url'].'';
-                            echo '
+                if (isset($data->Content)) {
+                    $content = $data->Content;
+                    $key = 'wx_goods_name';
+                    $textInfo = Redis::set($key,$content);
+                    $val=Redis::get($key);
+                    $goodsInfo = p_goods::all()->toArray();
+                    if ($goodsInfo) { //有值就把商品信息返回个用户
+                        //根据用户输入的商品名字去数据库里查询
+                        $goods_name = p_goods::where('goods_name', 'like', '%' . $content .'%');
+                        $title = $goods_name['goods_name'];//标题
+                        $textarea = $goods_name['goods_list'];
+                        $url = "https://1809liuziye.comcto.com";
+                        $picurl = 'https://1809liuziye.comcto.com' . $goods_name['goods_url'] . '';
+                        echo '
                         <xml>
                               <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
                               <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
@@ -151,15 +161,16 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
-                        }else{
-                            //没有则随机展示一条
-                            $total = p_goods::count() - 1;
-                            $skip = mt_rand(0, $total);
-                            $item = p_goods::select('goods_name', 'goods_id','goods_list','goods_url')->skip($skip)->take(1)->first();
-                            $title = $item['goods_name'];//标题
-                            $textarea =$item['goods_list'];
-                            $url = "https://1809liuziye.comcto.com";
-                            $picurl = 'https://1809liuziye.comcto.com'.$item['goods_url'].'';
+
+                    } else {
+                        //没有则随机展示一条
+                        $total = p_goods::count() - 1;
+                        $skip = mt_rand(0, $total);
+                        $item = p_goods::select('goods_name', 'goods_id', 'goods_list', 'goods_url')->skip($skip)->take(1)->first();
+                        $title = $item['goods_name'];//标题
+                        $textarea = $item['goods_list'];
+                        $url = "https://1809liuziye.comcto.com";
+                        $picurl = 'https://1809liuziye.comcto.com' . $item['goods_url'] . '';
 
                         echo '
                         <xml>
@@ -178,12 +189,8 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
-                        }
                     }
                 }
-
-
-
             } else if ($MsgType == 'voice') {    //语音入库
                 $file_name = $this->Wxyy($media_id); //语音的信息
                 $b_arr = [
@@ -212,7 +219,7 @@ class UserController extends Controller
                 $Info = Wx::where(['openid' => $openid])->first();
                 if ($Info) {
                     //数据库有值 就说明关注过
-                    echo '<xml><ToUserName><![CDATA[' . $openid . ']]></ToUserName><FromUserName><![CDATA[' . $wx_id . ']]></FromUserName><CreateTime>' . time() . '</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[' . '欢迎回来 ' . $Info['nickname'] . ']]></Content></xml>';
+                    echo '<xml><ToUserName><![CDATA[' . $openid . ']]></ToUserName><FromUserName><![CDATA[' . $wx_id . ']]></FromUserName><CreateTime>' . time() . '</CreateTime><MsgType><![CDATA[text]]></MsgType><Content><![CDATA[' . '请输入商品名字字样 ' . $Info['nickname'] . ']]></Content></xml>';
                 } else {
                     //没有值 添加入库
                     $u = $this->getUserInfo($openid);
@@ -234,12 +241,13 @@ class UserController extends Controller
                 $updateInfo = Wx::where(['openid' => $openid])->update(['sub_status' => 0]);
 
             }
-                if ($event=='SCAN') {
+            if ($event == 'SCAN') {
 //                    echo 111;
-                    $this->getimgtext($openid, $data, $wx_id);
-                }
+                $this->getimgtext($openid, $data, $wx_id);
+            }
         }
     }
+
     //根据access_koken获取用户信息 存到Redis中
     public function getAccessToken()
     {
@@ -471,14 +479,13 @@ class UserController extends Controller
             }
         }
     }
-//扫码跳转
+        //扫码跳转
     public function getgoods(){
         $goodsInfo=p_detail::all()->toArray();
         $server = $_SERVER['REQUEST_SCHEME'].'://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
         return view('wx.wxlist',['goodsInfo'=>$goodsInfo],['server'=>$server]);
     }
-
-    //创建公总号菜单接口
+    //创建今日福利菜单
     public function msgMenu(){
         //1、调用公众号菜单的接口
         $url = ' https://api.weixin.qq.com/cgi-bin/menu/create?access_token=' . $this->getAccessToken();
@@ -488,9 +495,15 @@ class UserController extends Controller
                 [
                     "type" => "view",
                     "name" => "今日福利",
-                    "url" => "https://1809liuziye.comcto.com/wxweb/u"
+                    "url" => "https://1809liuziye.comcto.com/wxfl"
                 ],
-            ]
+                [
+                    "type" => "view",
+                    "name" => "签到",
+                    "url" => "https://1809liuziye.comcto.com"
+                ],
+            ],
+
         ];
         //处理中文编码
         $json_str = json_encode($p_arr, JSON_UNESCAPED_UNICODE);
@@ -510,4 +523,17 @@ class UserController extends Controller
 //            echo "创建菜单成功";
 //        }
     }
+    //今日福利
+    public function wxfl(){
+
+
+    }
+    //网页授权回调
+    public function wxhui()
+    {
+
+
+
+    }
+
 }

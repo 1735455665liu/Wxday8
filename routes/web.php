@@ -43,6 +43,7 @@ Route::get('/jssdk','jssdk\jssdkController@jssdk');  //上传图片jssdk
 Route::get('/getimg','jssdk\jssdkController@getimg');  //接受数据
 Route::post('/wx_text','jssdk\jssdkController@wx_text');  //图文消息
 Route::get('/fxjssdk','User\UserController@fxjssdk');  //分享jssdk
+
 Route::get('/wxweb/u','User\UserController@repson');  //微信网页授权回调
 Route::get('/getgoods','User\UserController@getgoods');  //扫码跳转
 
@@ -50,11 +51,12 @@ Route::get('/getgoods','User\UserController@getgoods');  //扫码跳转
 //文件上传
 Route::get('/myfile','GoodsController@myfilezZ');  //扫码跳转
 
-
-
-
 Route::post('/msgMenu','User\UserController@msgMenu');  //自定义菜单
 
+
+
+Route::get('/wxfl','User\UserController@wxfl');  //今日福利
+Route::get('/wxhui','User\UserController@wxhui');  //微信回调
 
 
 
