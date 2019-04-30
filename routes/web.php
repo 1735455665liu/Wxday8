@@ -59,4 +59,4 @@ Route::get('/wxfl','User\UserController@wxfl');  //今日福利
 Route::get('/wxhui','User\UserController@wxhui');  //微信回调
 
 
-
+Route::post('/jihua','User\UserController@jihua');  //计划任务

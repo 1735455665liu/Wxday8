@@ -50,11 +50,6 @@ class UserController extends Controller
         $event = $data->Event;                 //事件类型
         $MsgType = $data->MsgType;
         $media_id = $data->MediaId;               //媒体文件id
-        $content=$data->Content;
-        $arr=[
-          'goods_name'=>$content,
-        ];
-        $p_goodsname=p_goodsname::insertGetId($arr);
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
@@ -132,17 +127,46 @@ class UserController extends Controller
                 }
                 if (isset($data->Content)) {
                     $content = $data->Content;
-                    $key='goodsname';
-                    $r=Redis::set($key,$content);
-                    $val=Redis::get($key);
+//                    $key='goodsname'.$content;
+//                    $con="$content";
+//                    $r=Redis::set($key,$con);
+//                    $val=Redis::get($key);
                     $goodsInfo = p_goods::all()->toArray();
-                    if ($goodsInfo) { //有值就把商品信息返回个用户
+                    if ($goodsInfo) {       //有值就把商品信息返回个用户
                         //根据用户输入的商品名字去数据库里查询
                         $goods_name = p_goods::where('goods_name', 'like', '%'.$content.'%')->first();
-                        $title = $goods_name['goods_name'];//标题
-                        $textarea = $goods_name['goods_list'];
-                        $url = "https://1809liuziye.comcto.com";
-                        $picurl = 'https://1809liuziye.comcto.com' . $goods_name['goods_url'] .'';
+                      if($goods_name){
+                          $title = $goods_name['goods_name'];//标题
+                          $textarea = $goods_name['goods_list'];
+                          $url = "https://1809liuziye.comcto.com";
+                          $picurl = 'https://1809liuziye.comcto.com' . $goods_name['goods_url'] .'';
+                          echo '
+                        <xml>
+                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
+                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
+                              <CreateTime>time()</CreateTime>
+                              <MsgType><![CDATA[news]]></MsgType>
+                              <ArticleCount>1</ArticleCount>
+                              <Articles>
+                                <item>
+                                  <Title><![CDATA[' . $title . ']]></Title>
+                                  <Description><![CDATA[' . $textarea . ']]></Description>
+                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
+                                  <Url><![CDATA[' . $url . ']]></Url>
+                                </item>
+                              </Articles>
+                            </xml>
+                      ';
+                      }else{
+                          //没有则随机展示一条
+                          $total = p_goods::count() - 1;
+                          $skip = mt_rand(0, $total);
+                          $item = p_goods::select('goods_name', 'goods_id', 'goods_list', 'goods_url')->skip($skip)->take(1)->first();
+
+                          $title = $item['goods_name'];//标题
+                          $textarea = $item['goods_list'];
+                          $url = "https://1809liuziye.comcto.com";
+                          $picurl = 'https://1809liuziye.comcto.com' . $item['goods_url'] . '';
                         echo '
                         <xml>
                               <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
@@ -160,34 +184,8 @@ class UserController extends Controller
                               </Articles>
                             </xml>
                       ';
+                      }
 
-                    } else {
-                        //没有则随机展示一条
-                        $total = p_goods::count() - 1;
-                        $skip = mt_rand(0, $total);
-                        $item = p_goods::select('goods_name', 'goods_id', 'goods_list', 'goods_url')->skip($skip)->take(1)->first();
-                        $title = $item['goods_name'];//标题
-                        $textarea = $item['goods_list'];
-                        $url = "https://1809liuziye.comcto.com";
-                        $picurl = 'https://1809liuziye.comcto.com' . $item['goods_url'] . '';
-
-                        echo '
-                        <xml>
-                              <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
-                              <FromUserName><![CDATA[' . $wx_id . ']]></FromUserName>
-                              <CreateTime>time()</CreateTime>
-                              <MsgType><![CDATA[news]]></MsgType>
-                              <ArticleCount>1</ArticleCount>
-                              <Articles>
-                                <item>
-                                  <Title><![CDATA[' . $title . ']]></Title>
-                                  <Description><![CDATA[' . $textarea . ']]></Description>
-                                  <PicUrl><![CDATA[' . $picurl . ']]></PicUrl>
-                                  <Url><![CDATA[' . $url . ']]></Url>
-                                </item>
-                              </Articles>
-                            </xml>
-                      ';
                     }
                 }
             } else if ($MsgType == 'voice') {    //语音入库
@@ -532,6 +530,15 @@ class UserController extends Controller
     {
 
 
+
+    }
+    public function jihua(){
+        $key='goodsname';
+        $val=Redis::get($key);
+        $arr=[
+            'goods_name'=>$val,
+        ];
+        $p_goodsname=p_goodsname::insertGetId($arr);
 
     }
 
