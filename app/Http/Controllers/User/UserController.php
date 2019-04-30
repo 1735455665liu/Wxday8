@@ -132,6 +132,9 @@ class UserController extends Controller
                 }
                 if (isset($data->Content)) {
                     $content = $data->Content;
+                    $key='goodsname';
+                    $r=Redis::set($key,$content);
+                    $val=Redis::get($key);
                     $goodsInfo = p_goods::all()->toArray();
                     if ($goodsInfo) { //有值就把商品信息返回个用户
                         //根据用户输入的商品名字去数据库里查询
