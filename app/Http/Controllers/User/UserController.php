@@ -133,13 +133,10 @@ class UserController extends Controller
                 }
                 if (isset($data->Content)) {
                     $content = $data->Content;
-                    $key = 'wx_goods_name';
-                    $textInfo = Redis::set($key,$content);
-                    $val=Redis::get($key);
                     $goodsInfo = p_goods::all()->toArray();
                     if ($goodsInfo) { //有值就把商品信息返回个用户
                         //根据用户输入的商品名字去数据库里查询
-                        $goods_name = p_goods::where('goods_name', 'like', '%' . $content .'%');
+                        $goods_name = p_goods::where('goods_name', 'like', '%'.$content.'%')->first();
                         $title = $goods_name['goods_name'];//标题
                         $textarea = $goods_name['goods_list'];
                         $url = "https://1809liuziye.comcto.com";
