@@ -51,11 +51,10 @@ class UserController extends Controller
         $MsgType = $data->MsgType;
         $media_id = $data->MediaId;               //媒体文件id
         $content=$data->Content;
-
-//        $p_goodsname=p_goodsname::
-
-
-
+        $arr=[
+          'goods_name'=>$content,
+        ];
+        $p_goodsname=p_goodsname::insertGetId($arr);
 //        消息类型
         if (isset($MsgType)) {        //检查变量是否被设置
             if ($MsgType == 'text') { //文本消息入库
@@ -140,7 +139,7 @@ class UserController extends Controller
                         $title = $goods_name['goods_name'];//标题
                         $textarea = $goods_name['goods_list'];
                         $url = "https://1809liuziye.comcto.com";
-                        $picurl = 'https://1809liuziye.comcto.com' . $goods_name['goods_url'] . '';
+                        $picurl = 'https://1809liuziye.comcto.com' . $goods_name['goods_url'] .'';
                         echo '
                         <xml>
                               <ToUserName><![CDATA[' . $openid . ']]></ToUserName>
